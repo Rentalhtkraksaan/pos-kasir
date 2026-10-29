@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POS Autonomous Mesh — Tier 3 (Executive Cyber-Glass)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-space: #090D16;
+      --bg-surface: rgba(15, 23, 42, 0.75);
+      --bg-card: rgba(30, 41, 59, 0.6);
+      --bg-card-hover: rgba(51, 65, 85, 0.75);
+      --border-glass: rgba(148, 163, 184, 0.15);
+      --border-cyan-glow: rgba(6, 182, 212, 0.35);
+      
+      --cyan-neon: #06B6D4;
+      --cyan-glow: 0 0 15px rgba(6, 182, 212, 0.4);
+      --emerald-matrix: #10B981;
+      --emerald-glow: 0 0 15px rgba(16, 185, 129, 0.4);
+      --violet-neon: #8B5CF6;
+      --rose-neon: #F43F5E;
+      --amber-neon: #F59E0B;
+
+      --text-white: #FFFFFF;
+      --text-slate: #94A3B8;
+      --text-dim: #64748B;
+
+      --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background-color: var(--bg-space);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.06) 0%, transparent 40%),
+        linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+      color: var(--text-white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Telemetry HUD Topbar */
+    .hud-bar {
+      height: 68px;
+      background: var(--bg-surface);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-glass);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .hud-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-mesh {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mesh-node-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(16, 185, 129, 0.2));
+      border: 1px solid var(--border-cyan-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--cyan-glow);
+    }
+
+    .mesh-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tier-badge-mesh {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(6, 182, 212, 0.15);
+      border: 1px solid var(--border-cyan-glow);
+      color: var(--cyan-neon);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Branch Switcher Select */
+    .branch-select-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-glass);
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    .branch-select {
+      background: transparent;
+      border: none;
+      color: var(--text-white);
+      font-family: var(--font-ui);
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Telemetry Diagnostics Pulse */
+    .hud-telemetry {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .telemetry-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-slate);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald-matrix);
+      box-shadow: 0 0 8px var(--emerald-matrix);
+      animation: pulseAnim 2s infinite;
+    }
+
+    @keyframes pulseAnim {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Sparkline SVG Velocity Graph */
+    .velocity-graph {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      background: rgba(15, 23, 42, 0.4);
+      border-radius: 6px;
+      border: 1px solid var(--border-glass);
+    }
+
+    .hud-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Role Matrix Dropdown */
+    .role-select {
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      color: #C4B5FD;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-ui);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-glass {
+      background: rgba(30, 41, 59, 0.5);
+      backdrop-filter: blur(10px);
+      border-color: var(--border-glass);
+      color: var(--text-white);
+    }
+    .btn-glass:hover {
+      background: rgba(51, 65, 85, 0.7);
+      border-color: var(--cyan-neon);
+      box-shadow: var(--cyan-glow);
+    }
+
+    .btn-cyan {
+      background: var(--cyan-neon);
+      color: #04121F;
+      font-weight: 700;
+      box-shadow: var(--cyan-glow);
+    }
+    .btn-cyan:hover {
+      background: #22D3EE;
+    }
+
+    .btn-emerald {
+      background: var(--emerald-matrix);
+      color: #022013;
+      font-weight: 700;
+      box-shadow: var(--emerald-glow);
+    }
+
+    /* Main Grid Viewport */
+    .main-viewport {
+      display: grid;
+      grid-template-columns: 1fr 440px;
+      flex: 1;
+      height: calc(100vh - 68px);
+      overflow: hidden;
+    }
+
+    /* Left Operational Zone */
+    .operations-zone {
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Navigation Mode Tabs */
+    .view-switcher-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-glass);
+      padding-bottom: 14px;
+    }
+
+    .nav-pills {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pill-tab {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-glass);
+      color: var(--text-slate);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .pill-tab:hover {
+      color: var(--text-white);
+      border-color: var(--border-cyan-glow);
+    }
+    .pill-tab.active {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(16, 185, 129, 0.15));
+      border-color: var(--cyan-neon);
+      color: var(--cyan-neon);
+      box-shadow: var(--cyan-glow);
+    }
+
+    /* Sub-Views Container */
+    .subview-pane {
+      display: none;
+    }
+    .subview-pane.active {
+      display: block;
+    }
+
+    /* PANE 1: POS CATALOG & REAL-TIME INVENTORY */
+    .catalog-search-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .search-glass {
+      flex: 1;
+      position: relative;
+    }
+    .search-glass svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--cyan-neon);
+    }
+    .search-input-mesh {
+      width: 100%;
+      padding: 12px 14px 12px 42px;
+      background: var(--bg-surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      color: #FFFFFF;
+      font-size: 14px;
+      outline: none;
+    }
+    .search-input-mesh:focus {
+      border-color: var(--cyan-neon);
+      box-shadow: var(--cyan-glow);
+    }
+
+    .products-cyber-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 18px;
+    }
+
+    .cyber-product-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .cyber-product-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-cyan-glow);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px -10px rgba(6, 182, 212, 0.3);
+    }
+
+    .bom-badge {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: var(--cyan-neon);
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .card-prod-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 4px;
+    }
+
+    .card-prod-recipe {
+      font-size: 11px;
+      color: var(--text-slate);
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    .card-prod-price {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--emerald-matrix);
+      margin-bottom: 14px;
+    }
+
+    /* PANE 2: BILL OF MATERIALS (BOM) RAW INVENTORY ENGINE */
+    .bom-engine-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .bom-matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .bom-matrix-table th {
+      background: rgba(15, 23, 42, 0.8);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-slate);
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .bom-matrix-table td {
+      padding: 14px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .stock-meter-wrap {
+      width: 120px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .stock-meter-fill {
+      height: 100%;
+      background: var(--cyan-neon);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    /* PANE 3: KITCHEN DISPLAY SYSTEM (KDS) LIVE BRIDGE */
+    .kds-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .kds-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+    .kds-card.urgent {
+      border-color: var(--rose-neon);
+      box-shadow: 0 0 15px rgba(244, 63, 94, 0.3);
+    }
+
+    .kds-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-glass);
+      padding-bottom: 10px;
+    }
+
+    .kds-timer {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cyan-neon);
+    }
+    .kds-card.urgent .kds-timer {
+      color: var(--rose-neon);
+    }
+
+    /* PANE 4: EXECUTIVE BI WATERFALL & AI FORECAST */
+    .bi-dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .bi-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+
+    .waterfall-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border-glass);
+      font-size: 13px;
+    }
+
+    .ai-alert-banner {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(139, 92, 246, 0.15));
+      border: 1px solid var(--border-cyan-glow);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    /* Right Checkout HUD & Omnichannel Panel */
+    .cyber-checkout-panel {
+      background: var(--bg-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-left: 1px solid var(--border-glass);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 68px);
+    }
+
+    .checkout-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-glass);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cart-items-mesh {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .mesh-cart-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid var(--border-glass);
+      border-radius: 8px;
+    }
+
+    .cart-totals-area {
+      padding: 20px 24px;
+      background: rgba(9, 13, 22, 0.8);
+      border-top: 1px solid var(--border-glass);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .total-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-slate);
+    }
+    .total-line .val {
+      font-family: var(--font-mono);
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+    .total-line.grand {
+      font-size: 18px;
+      font-weight: 700;
+      color: #FFFFFF;
+      border-top: 1px dashed var(--border-glass);
+      padding-top: 10px;
+    }
+    .total-line.grand .val {
+      color: var(--cyan-neon);
+      font-size: 22px;
+      text-shadow: var(--cyan-glow);
+    }
+
+    /* Modals & Overlays */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .cyber-modal {
+      background: #0B132B;
+      border: 1px solid var(--border-cyan-glow);
+      box-shadow: 0 0 30px rgba(6, 182, 212, 0.25);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 540px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cyber-modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-glass);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cyber-modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 75vh;
+      overflow-y: auto;
+    }
+
+    .cyber-modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-glass);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Dynamic QRIS Simulation Box */
+    .qris-canvas-box {
+      background: #FFFFFF;
+      padding: 16px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+    }
+
+    .qris-status-listener {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--cyan-neon);
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Telemetry HUD Topbar -->
+  <header class="hud-bar">
+    <div class="hud-left">
+      <div class="brand-mesh">
+        <div class="mesh-node-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--cyan-neon)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 3a9 9 0 0 0-9 9m18 0a9 9 0 0 0-9-9m0 18a9 9 0 0 0 9-9m-18 0a9 9 0 0 0 9 9"/></svg>
+        </div>
+        <div>
+          <div class="mesh-title">
+            AUTONOMOUS MESH
+            <span class="tier-badge-mesh">Tier 3 &bull; Cloud OS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Multi-Branch Outlet Switcher -->
+      <div class="branch-select-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cyan-neon)" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <select id="branch-select" class="branch-select" onchange="switchBranchContext(this.value)">
+          <option value="JKT-CENTRAL">Outlet Jakarta Pusat (Flagship)</option>
+          <option value="BSD-SERPONG">Outlet BSD Serpong (Drive-thru)</option>
+          <option value="WH-LOGISTICS">Central Warehouse Logistics</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Center HUD Telemetry -->
+    <div class="hud-telemetry">
+      <div class="telemetry-item">
+        <span class="pulse-dot"></span>
+        <span id="mesh-sync-status">MESH PEER: 14ms (SYNCED)</span>
+      </div>
+
+      <div class="velocity-graph">
+        <span style="font-size: 10px; color: var(--text-slate);">VELOCITY:</span>
+        <svg width="90" height="20" viewBox="0 0 90 20">
+          <polyline fill="none" stroke="var(--cyan-neon)" stroke-width="2" points="0,15 15,12 30,16 45,6 60,11 75,4 90,8"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Right Actions & Role Matrix -->
+    <div class="hud-actions">
+      <!-- 5-Tier Role Matrix -->
+      <select id="role-matrix-select" class="role-select" onchange="switchRoleMatrix(this.value)">
+        <option value="OWNER">Role: Executive Owner</option>
+        <option value="GM">Role: General Manager</option>
+        <option value="CASHIER">Role: Cashier Lead</option>
+        <option value="KITCHEN">Role: Kitchen Master</option>
+        <option value="INVENTORY">Role: Inventory Logistics</option>
+      </select>
+
+      <a href="../index.html" class="btn btn-glass" title="Kembali ke Portal Pusat">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Portal
+      </a>
+    </div>
+  </header>
+
+  <!-- Viewport Grid -->
+  <main class="main-viewport">
+    
+    <!-- Left Operations -->
+    <section class="operations-zone">
+      
+      <!-- View Switcher -->
+      <div class="view-switcher-bar">
+        <div class="nav-pills">
+          <button class="pill-tab active" id="tab-btn-catalog" onclick="switchMainView('catalog')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+            Terminal Kasir
+          </button>
+          <button class="pill-tab" id="tab-btn-bom" onclick="switchMainView('bom')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            BOM Bahan Baku
+          </button>
+          <button class="pill-tab" id="tab-btn-kds" onclick="switchMainView('kds')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/></svg>
+            KDS Dapur Live
+          </button>
+          <button class="pill-tab" id="tab-btn-bi" onclick="switchMainView('bi')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Executive BI
+          </button>
+          <button class="pill-tab" id="tab-btn-audit" onclick="switchMainView('audit')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Audit Trail
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEW 1: TERMINAL KASIR -->
+      <div class="subview-pane active" id="pane-catalog">
+        <div class="catalog-search-row">
+          <div class="search-glass">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="21" y1="21" y2="16.65"/></svg>
+            <input type="text" id="catalog-search-input" class="search-input-mesh" placeholder="Cari menu, SKU atau resep bahan baku..." oninput="filterCatalog(this.value)">
+          </div>
+        </div>
+
+        <div class="products-cyber-grid" id="products-cyber-grid">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- VIEW 2: BILL OF MATERIALS (BOM) RAW INVENTORY ENGINE -->
+      <div class="subview-pane" id="pane-bom">
+        <div class="bom-engine-panel">
+          <div>
+            <h3 style="font-size: 18px; font-weight: 700; color: #FFFFFF;">BOM Raw Materials Inventory Engine</h3>
+            <p style="font-size: 13px; color: var(--text-slate);">Setiap penjualan menu otomatis memotong gramatur bahan baku secara presisi per gram/ml.</p>
+          </div>
+
+          <table class="bom-matrix-table">
+            <thead>
+              <tr>
+                <th>Bahan Baku</th>
+                <th>Satuan</th>
+                <th>Stok Saat Ini</th>
+                <th>Level Kapasitas</th>
+                <th>HPP per Satuan</th>
+                <th>Aksi Pasokan</th>
+              </tr>
+            </thead>
+            <tbody id="bom-inventory-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VIEW 3: KITCHEN DISPLAY SYSTEM (KDS) LIVE BRIDGE -->
+      <div class="subview-pane" id="pane-kds">
+        <div>
+          <h3 style="font-size: 18px; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">Kitchen &amp; Barista Live Bridge (KDS)</h3>
+          <p style="font-size: 13px; color: var(--text-slate); margin-bottom: 16px;">Antrean persiapan pesanan otomatis dengan countdown timer dan priority bumping.</p>
+        </div>
+
+        <div class="kds-grid" id="kds-orders-grid">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- VIEW 4: EXECUTIVE BI WATERFALL & AI FORECAST -->
+      <div class="subview-pane" id="pane-bi">
+        <!-- AI Alert Banner -->
+        <div class="ai-alert-banner">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--cyan-neon)" stroke-width="2"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 22v-4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M22 12h-4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+          <div>
+            <div style="font-size: 14px; font-weight: 700; color: var(--cyan-neon);">AI Predictive Depletion Alert</div>
+            <div style="font-size: 12px; color: var(--text-white); margin-top: 2px;" id="ai-depletion-msg">
+              Berdasarkan kecepatan transaksi saat ini (velocity peak), <strong>Biji Kopi Arabica</strong> diprediksi akan habis dalam <strong>38 Jam</strong>. Disarankan trigger PO ke Central Warehouse sekarang.
+            </div>
+          </div>
+        </div>
+
+        <div class="bi-dashboard-grid">
+          <div class="bi-card">
+            <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 14px; color: #FFFFFF;">Gross vs Net Profit Waterfall Analysis</h4>
+            <div class="waterfall-row">
+              <span>Gross Revenue (Total Omzet)</span>
+              <span style="font-family: var(--font-mono); font-weight: 700; color: var(--cyan-neon);" id="wf-gross-revenue">Rp 12.450.000</span>
+            </div>
+            <div class="waterfall-row">
+              <span>Cost of Goods Sold (BOM Bahan Baku)</span>
+              <span style="font-family: var(--font-mono); font-weight: 700; color: var(--rose-neon);" id="wf-cogs">- Rp 3.820.000</span>
+            </div>
+            <div class="waterfall-row">
+              <span>Operating Overhead &amp; Utilities (Est. 12%)</span>
+              <span style="font-family: var(--font-mono); font-weight: 700; color: var(--amber-neon);" id="wf-overhead">- Rp 1.494.000</span>
+            </div>
+            <div class="waterfall-row" style="border-bottom: none; font-size: 15px; font-weight: 700; padding-top: 14px;">
+              <span>Net EBITDA Profit Margin</span>
+              <span style="font-family: var(--font-mono); color: var(--emerald-matrix); font-size: 18px;" id="wf-net-profit">Rp 7.136.000 (57.3%)</span>
+            </div>
+          </div>
+
+          <div class="bi-card">
+            <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 14px; color: #FFFFFF;">Leaderboard Performa Staf Kasir</h4>
+            <div id="staff-leaderboard-list">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 5: CRYPTOGRAPHIC AUDIT TRAIL -->
+      <div class="subview-pane" id="pane-audit">
+        <div>
+          <h3 style="font-size: 18px; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">Tamper-Proof Audit Trail Matrix</h3>
+          <p style="font-size: 13px; color: var(--text-slate); margin-bottom: 16px;">Setiap aksi sensitif dirantai dengan cryptographic SHA-256 block hash anti-pemalsuan.</p>
+        </div>
+
+        <div style="background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 16px; font-family: var(--font-mono); font-size: 11px; max-height: 480px; overflow-y: auto;" id="audit-log-terminal">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Right Cyber Checkout HUD -->
+    <aside class="cyber-checkout-panel">
+      <div class="checkout-header">
+        <div>
+          <div style="font-size: 14px; font-weight: 700; color: #FFFFFF;">POS TERMINAL HUD</div>
+          <div style="font-size: 11px; color: var(--cyan-neon); font-family: var(--font-mono);" id="checkout-branch-tag">NODE: JKT-CENTRAL #01</div>
+        </div>
+        <button class="btn btn-glass" style="font-size: 11px; padding: 4px 8px;" onclick="clearCart()">
+          Reset
+        </button>
+      </div>
+
+      <div class="cart-items-mesh" id="mesh-cart-container">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="cart-totals-area">
+        <div class="total-line">
+          <span>Subtotal Item</span>
+          <span class="val" id="mesh-subtotal">Rp 0</span>
+        </div>
+        <div class="total-line">
+          <span>Pajak Resto (10%)</span>
+          <span class="val" id="mesh-tax">Rp 0</span>
+        </div>
+        <div class="total-line grand">
+          <span>Grand Total</span>
+          <span class="val" id="mesh-grandtotal">Rp 0</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px;">
+          <button class="btn btn-cyan" onclick="openDynamicQrisModal()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/><path d="M17 17h.01"/></svg>
+            Dynamic QRIS
+          </button>
+          <button class="btn btn-emerald" onclick="executeCashInstant()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Tunai Cepat
+          </button>
+        </div>
+
+        <!-- WhatsApp Omnichannel Button -->
+        <button class="btn btn-glass" onclick="openWhatsAppReceiptModal()" style="font-size: 12px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Kirim E-Receipt WhatsApp
+        </button>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- Modals -->
+
+  <!-- Dynamic QRIS Settlement Modal -->
+  <div class="modal-backdrop" id="qris-modal">
+    <div class="cyber-modal">
+      <div class="cyber-modal-header">
+        <h3 style="font-size: 16px; font-weight: 700; color: #FFFFFF;">Dynamic QRIS Auto-Settlement Gateway</h3>
+        <button class="btn btn-glass" style="font-size: 11px; padding: 4px 8px;" onclick="closeQrisModal()">Batal</button>
+      </div>
+      <div class="cyber-modal-body" style="text-align: center;">
+        <div class="qris-canvas-box">
+          <!-- Dynamic SVG QR Code Simulation -->
+          <svg width="180" height="180" viewBox="0 0 180 180" id="qris-matrix-svg">
+            <!-- Simulated QR Matrix -->
+            <rect width="180" height="180" fill="#FFFFFF"/>
+            <!-- Position Detection Patterns -->
+            <rect x="15" y="15" width="45" height="45" fill="#000000"/>
+            <rect x="22" y="22" width="31" height="31" fill="#FFFFFF"/>
+            <rect x="28" y="28" width="19" height="19" fill="#000000"/>
+
+            <rect x="120" y="15" width="45" height="45" fill="#000000"/>
+            <rect x="127" y="22" width="31" height="31" fill="#FFFFFF"/>
+            <rect x="133" y="28" width="19" height="19" fill="#000000"/>
+
+            <rect x="15" y="120" width="45" height="45" fill="#000000"/>
+            <rect x="22" y="127" width="31" height="31" fill="#FFFFFF"/>
+            <rect x="28" y="133" width="19" height="19" fill="#000000"/>
+
+            <!-- Center Badge -->
+            <rect x="75" y="75" width="30" height="30" fill="#06B6D4" rx="4"/>
+            <text x="90" y="93" fill="#FFFFFF" font-size="9" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">QRIS</text>
+          </svg>
+          <div style="font-size: 11px; font-weight: 700; color: #000; margin-top: 8px;">NMID: ID1020268892010</div>
+        </div>
+
+        <div style="font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--cyan-neon);" id="qris-nominal-display">Rp 0</div>
+
+        <div class="qris-status-listener">
+          <div class="pulse-dot"></div>
+          <span id="qris-listener-text">WebSocket Listener: Menunggu pembayaran customer...</span>
+        </div>
+
+        <button class="btn btn-cyan" onclick="simulateInstantQrisSettlement()" style="margin-top: 10px;">
+          Simulasikan Pelanggan Scan &amp; Bayar (Auto-Push)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WhatsApp E-Receipt Modal -->
+  <div class="modal-backdrop" id="wa-modal">
+    <div class="cyber-modal">
+      <div class="cyber-modal-header">
+        <h3 style="font-size: 16px; font-weight: 700; color: #FFFFFF;">Omnichannel WhatsApp Digital Receipt</h3>
+        <button class="btn btn-glass" style="font-size: 11px; padding: 4px 8px;" onclick="closeWaModal()">Tutup</button>
+      </div>
+      <div class="cyber-modal-body">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 12px; color: var(--text-slate);">Nomor WhatsApp Pelanggan (Format: 628...):</label>
+          <input type="text" id="wa-phone-input" class="search-input-mesh" placeholder="6281234567890" value="6281298765432">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 12px; color: var(--text-slate);">Preview Teks Struk WhatsApp:</label>
+          <textarea id="wa-receipt-preview" style="width: 100%; height: 160px; background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-glass); border-radius: 8px; color: var(--text-white); font-family: var(--font-mono); font-size: 11px; padding: 10px; outline: none;" readonly></textarea>
+        </div>
+      </div>
+      <div class="cyber-modal-footer">
+        <button class="btn btn-glass" onclick="closeWaModal()">Batal</button>
+        <button class="btn btn-emerald" onclick="dispatchWhatsAppUrl()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          Kirim via WhatsApp Web / App
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/license-core.js"></script>
+
+  <script>
+    /**
+     * TIER 3: AUTONOMOUS MESH POS SYSTEM
+     */
+    let currentBranch = 'JKT-CENTRAL';
+    let currentRole = 'OWNER';
+    let currentCart = [];
+    let auditLogs = [];
+
+    // Bill of Materials (BOM) Raw Inventory State (Fractional precision)
+    const BOM_RAW_INVENTORY = {
+      'RAW-COFFEE': { id: 'RAW-COFFEE', name: 'Biji Kopi Arabica Gayo', unit: 'Gram', stock: 4850.5, maxStock: 6000, costPerUnit: 250 }, // Rp 250 / gram
+      'RAW-MILK': { id: 'RAW-MILK', name: 'Fresh Milk Barista Grade', unit: 'ml', stock: 11400.0, maxStock: 15000, costPerUnit: 20 }, // Rp 20 / ml
+      'RAW-SYRUP': { id: 'RAW-SYRUP', name: 'Madagascar Vanilla Syrup', unit: 'ml', stock: 1850.0, maxStock: 2500, costPerUnit: 150 }, // Rp 150 / ml
+      'RAW-CUP': { id: 'RAW-CUP', name: 'Paper Cup Eco 12oz + Lid', unit: 'Pcs', stock: 320, maxStock: 500, costPerUnit: 1200 },
+      'RAW-STRAW': { id: 'RAW-STRAW', name: 'Bio PLA Straw', unit: 'Pcs', stock: 480, maxStock: 600, costPerUnit: 200 },
+      'RAW-WAGYU': { id: 'RAW-WAGYU', name: 'Wagyu Beef Minced Patty', unit: 'Gram', stock: 3400.0, maxStock: 5000, costPerUnit: 350 },
+      'RAW-BUN': { id: 'RAW-BUN', name: 'Brioche Burger Bun', unit: 'Pcs', stock: 45, maxStock: 80, costPerUnit: 3500 }
+    };
+
+    // Menu Products with Recipe Bindings
+    const MENU_PRODUCTS = [
+      {
+        id: 'AUT-01',
+        sku: 'LATTE-01',
+        name: 'Cyber Velvet Iced Latte',
+        price: 32000,
+        recipeDescription: '18g Arabica + 150ml Milk + 1 Cup + 1 Straw',
+        bomRecipe: [
+          { rawId: 'RAW-COFFEE', qty: 18.0 },
+          { rawId: 'RAW-MILK', qty: 150.0 },
+          { rawId: 'RAW-CUP', qty: 1 },
+          { rawId: 'RAW-STRAW', qty: 1 }
+        ]
+      },
+      {
+        id: 'AUT-02',
+        sku: 'VAN-02',
+        name: 'Madagascar Vanilla Latte',
+        price: 38000,
+        recipeDescription: '18g Arabica + 140ml Milk + 20ml Syrup + 1 Cup',
+        bomRecipe: [
+          { rawId: 'RAW-COFFEE', qty: 18.0 },
+          { rawId: 'RAW-MILK', qty: 140.0 },
+          { rawId: 'RAW-SYRUP', qty: 20.0 },
+          { rawId: 'RAW-CUP', qty: 1 },
+          { rawId: 'RAW-STRAW', qty: 1 }
+        ]
+      },
+      {
+        id: 'AUT-03',
+        sku: 'ESP-03',
+        name: 'Double Shot Espresso',
+        price: 24000,
+        recipeDescription: '20g Arabica Extraction',
+        bomRecipe: [
+          { rawId: 'RAW-COFFEE', qty: 20.0 },
+          { rawId: 'RAW-CUP', qty: 1 }
+        ]
+      },
+      {
+        id: 'AUT-04',
+        sku: 'BGR-01',
+        name: 'Autonomous Wagyu Burger',
+        price: 68000,
+        recipeDescription: '120g Wagyu Patty + 1 Brioche Bun',
+        bomRecipe: [
+          { rawId: 'RAW-WAGYU', qty: 120.0 },
+          { rawId: 'RAW-BUN', qty: 1 }
+        ]
+      }
+    ];
+
+    // Live KDS Preparation Queue
+    let kdsOrders = [
+      { id: 'ORD-901', table: 'Meja 04', items: '2x Cyber Velvet Iced Latte', station: 'BARISTA', elapsedSec: 85, urgent: false },
+      { id: 'ORD-902', table: 'Drive-Thru 02', items: '1x Autonomous Wagyu Burger', station: 'KITCHEN', elapsedSec: 290, urgent: true }
+    ];
+
+    // Staff Leaderboard
+    const staffLeaderboard = [
+      { name: 'Rian Pratama', role: 'Head Cashier', sales: 4850000, count: 42 },
+      { name: 'Siti Amelia', role: 'Barista Lead', sales: 3920000, count: 36 },
+      { name: 'Dimas Kurnia', role: 'Junior Cashier', sales: 2680000, count: 21 }
+    ];
+
+    function formatIdr(n) {
+      return 'Rp ' + Number(n || 0).toLocaleString('id-ID');
+    }
+
+    // App Init
+    function initAutonomousApp() {
+      renderCatalog();
+      renderCart();
+      renderBomTable();
+      renderKds();
+      renderLeaderboard();
+      logAuditAction('INITIALIZE_SYSTEM', 'Autonomous Mesh Core initialized on Node JKT-CENTRAL.');
+
+      // Start KDS timer tick
+      setInterval(tickKdsTimers, 1000);
+    }
+
+    // Branch Context Switching
+    function switchBranchContext(branchKey) {
+      currentBranch = branchKey;
+      document.getElementById('checkout-branch-tag').textContent = `NODE: ${branchKey} #01`;
+      logAuditAction('BRANCH_SWITCH', `Active terminal context moved to ${branchKey}`);
+    }
+
+    function switchRoleMatrix(roleKey) {
+      currentRole = roleKey;
+      logAuditAction('ROLE_ELEVATION', `Terminal role profile switched to ${roleKey}`);
+    }
+
+    // View Navigation
+    function switchMainView(viewId) {
+      document.querySelectorAll('.pill-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.subview-pane').forEach(p => p.classList.remove('active'));
+
+      document.getElementById(`tab-btn-${viewId}`).classList.add('active');
+      document.getElementById(`pane-${viewId}`).classList.add('active');
+    }
+
+    // Catalog Rendering
+    function renderCatalog(filter = '') {
+      const grid = document.getElementById('products-cyber-grid');
+      const filtered = MENU_PRODUCTS.filter(p => !filter || p.name.toLowerCase().includes(filter.toLowerCase()));
+
+      grid.innerHTML = filtered.map(p => `
+        <div class="cyber-product-card">
+          <div>
+            <span class="bom-badge">BOM RECIPE BOUND</span>
+            <h4 class="card-prod-title">${p.name}</h4>
+            <div class="card-prod-recipe">${p.recipeDescription}</div>
+          </div>
+          <div>
+            <div class="card-prod-price">${formatIdr(p.price)}</div>
+            <button class="btn btn-cyan" style="width: 100%;" onclick="addToCart('${p.id}')">
+              + Add to Terminal
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterCatalog(val) {
+      renderCatalog(val);
+    }
+
+    // Cart Operations
+    function addToCart(productId) {
+      const prod = MENU_PRODUCTS.find(p => p.id === productId);
+      if (!prod) return;
+
+      const existing = currentCart.find(i => i.id === productId);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        currentCart.push({ ...prod, qty: 1 });
+      }
+      renderCart();
+    }
+
+    function updateCartItemQty(prodId, delta) {
+      const idx = currentCart.findIndex(i => i.id === prodId);
+      if (idx === -1) return;
+      currentCart[idx].qty += delta;
+      if (currentCart[idx].qty <= 0) currentCart.splice(idx, 1);
+      renderCart();
+    }
+
+    function clearCart() {
+      currentCart = [];
+      renderCart();
+    }
+
+    function renderCart() {
+      const container = document.getElementById('mesh-cart-container');
+      if (currentCart.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; color: var(--text-slate); padding: 48px 0; font-size: 13px;">
+            Terminal siap menerima pesanan.<br>Pilih menu di panel kiri.
+          </div>
+        `;
+        updateMeshTotals();
+        return;
+      }
+
+      container.innerHTML = currentCart.map(item => `
+        <div class="mesh-cart-item">
+          <div>
+            <div style="font-size: 13px; font-weight: 600; color: #FFFFFF;">${item.name}</div>
+            <div style="font-size: 11px; font-family: var(--font-mono); color: var(--cyan-neon);">${formatIdr(item.price)}</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <button class="btn btn-glass" style="padding: 2px 8px;" onclick="updateCartItemQty('${item.id}', -1)">-</button>
+            <span style="font-family: var(--font-mono); font-size: 12px; width: 20px; text-align: center;">${item.qty}</span>
+            <button class="btn btn-glass" style="padding: 2px 8px;" onclick="updateCartItemQty('${item.id}', 1)">+</button>
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 13px; font-weight: 700; text-align: right; min-width: 60px;">
+            ${formatIdr(item.price * item.qty)}
+          </div>
+        </div>
+      `).join('');
+
+      updateMeshTotals();
+    }
+
+    function updateMeshTotals() {
+      const subtotal = currentCart.reduce((a, b) => a + (b.price * b.qty), 0);
+      const tax = Math.round(subtotal * 0.10);
+      const grandTotal = subtotal + tax;
+
+      document.getElementById('mesh-subtotal').textContent = formatIdr(subtotal);
+      document.getElementById('mesh-tax').textContent = formatIdr(tax);
+      document.getElementById('mesh-grandtotal').textContent = formatIdr(grandTotal);
+
+      return { subtotal, tax, grandTotal };
+    }
+
+    // Bill of Materials (BOM) Fractional Stock Deduction
+    function deductBomIngredients(cartItems) {
+      cartItems.forEach(cartItem => {
+        const prod = MENU_PRODUCTS.find(p => p.id === cartItem.id);
+        if (prod && prod.bomRecipe) {
+          prod.bomRecipe.forEach(recipeItem => {
+            const raw = BOM_RAW_INVENTORY[recipeItem.rawId];
+            if (raw) {
+              const totalDeduct = recipeItem.qty * cartItem.qty;
+              raw.stock = Math.max(0, raw.stock - totalDeduct);
+            }
+          });
+        }
+      });
+      renderBomTable();
+    }
+
+    function renderBomTable() {
+      const tbody = document.getElementById('bom-inventory-tbody');
+      tbody.innerHTML = Object.values(BOM_RAW_INVENTORY).map(raw => {
+        const pct = Math.round((raw.stock / raw.maxStock) * 100);
+        const isCritical = pct < 25;
+
+        return `
+          <tr>
+            <td><strong>${raw.name}</strong></td>
+            <td><span style="font-family: var(--font-mono); font-size: 11px;">${raw.unit}</span></td>
+            <td>
+              <span style="font-family: var(--font-mono); font-weight: 700; color: ${isCritical ? 'var(--rose-neon)' : 'var(--cyan-neon)'};">
+                ${raw.stock.toLocaleString('id-ID', { minimumFractionDigits: 1 })}
+              </span>
+            </td>
+            <td>
+              <div style="font-size: 11px; margin-bottom: 2px;">${pct}% Kapasitas</div>
+              <div class="stock-meter-wrap">
+                <div class="stock-meter-fill" style="width: ${pct}%; background: ${isCritical ? 'var(--rose-neon)' : 'var(--cyan-neon)'};"></div>
+              </div>
+            </td>
+            <td><span style="font-family: var(--font-mono);">${formatIdr(raw.costPerUnit)} / ${raw.unit}</span></td>
+            <td>
+              <button class="btn btn-glass" style="font-size: 11px; padding: 4px 8px;" onclick="restockRaw('${raw.id}', 1000)">
+                + Reorder PO
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function restockRaw(rawId, amount) {
+      if (BOM_RAW_INVENTORY[rawId]) {
+        BOM_RAW_INVENTORY[rawId].stock = Math.min(BOM_RAW_INVENTORY[rawId].maxStock, BOM_RAW_INVENTORY[rawId].stock + amount);
+        renderBomTable();
+        logAuditAction('BOM_RESTOCK', `Restocked ${amount} ${BOM_RAW_INVENTORY[rawId].unit} to ${BOM_RAW_INVENTORY[rawId].name}`);
+      }
+    }
+
+    // Dynamic QRIS Payment Simulation
+    function openDynamicQrisModal() {
+      if (currentCart.length === 0) return;
+      const { grandTotal } = updateMeshTotals();
+      document.getElementById('qris-nominal-display').textContent = formatIdr(grandTotal);
+      document.getElementById('qris-listener-text').textContent = 'WebSocket Listener: Menunggu scan QRIS customer...';
+      document.getElementById('qris-modal').classList.add('active');
+    }
+
+    function closeQrisModal() {
+      document.getElementById('qris-modal').classList.remove('active');
+    }
+
+    function simulateInstantQrisSettlement() {
+      document.getElementById('qris-listener-text').textContent = 'WEBHOOK RECEIVED: Settlement Berhasil (Bank BCA / GoPay)';
+      setTimeout(() => {
+        closeQrisModal();
+        finalizeAutonomousOrder('QRIS_AUTO_SETTLED');
+      }, 700);
+    }
+
+    function executeCashInstant() {
+      if (currentCart.length === 0) return;
+      finalizeAutonomousOrder('CASH_SETTLED');
+    }
+
+    function finalizeAutonomousOrder(paymentMethod) {
+      const { grandTotal } = updateMeshTotals();
+      const orderId = 'ORD-' + Math.floor(100 + Math.random() * 900);
+
+      // 1. Deduct Raw BOM
+      deductBomIngredients(currentCart);
+
+      // 2. Dispatch to KDS
+      kdsOrders.unshift({
+        id: orderId,
+        table: 'Terminal Node #01',
+        items: currentCart.map(i => `${i.qty}x ${i.name}`).join(', '),
+        station: 'BARISTA / KITCHEN',
+        elapsedSec: 0,
+        urgent: false
+      });
+      renderKds();
+
+      // 3. Log Audit
+      logAuditAction('ORDER_COMPLETED', `Order ${orderId} (${paymentMethod}) settled for ${formatIdr(grandTotal)} via Node ${currentBranch}`);
+
+      alert(`Transaksi Sukses! Order ${orderId} otomatis diteruskan ke KDS Live Bridge & Stok Bahan Baku terpotong.`);
+      clearCart();
+    }
+
+    // KDS Live Bridge Operations
+    function renderKds() {
+      const container = document.getElementById('kds-orders-grid');
+      container.innerHTML = kdsOrders.map((k, idx) => {
+        const mins = String(Math.floor(k.elapsedSec / 60)).padStart(2, '0');
+        const secs = String(k.elapsedSec % 60).padStart(2, '0');
+
+        return `
+          <div class="kds-card ${k.urgent ? 'urgent' : ''}">
+            <div class="kds-header">
+              <span style="font-weight: 700; font-family: var(--font-mono);">${k.id}</span>
+              <span class="kds-timer">${mins}:${secs}</span>
+            </div>
+            <div style="font-size: 13px; font-weight: 600; color: #FFFFFF;">${k.table}</div>
+            <div style="font-size: 12px; color: var(--text-slate);">${k.items}</div>
+            <div style="display: flex; gap: 8px; margin-top: 6px;">
+              <button class="btn btn-emerald" style="flex:1; font-size:11px;" onclick="bumpKdsOrder(${idx})">
+                Bump / Siap Saji
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function tickKdsTimers() {
+      kdsOrders.forEach(o => {
+        o.elapsedSec += 1;
+        if (o.elapsedSec > 240) o.urgent = true;
+      });
+      renderKds();
+    }
+
+    function bumpKdsOrder(idx) {
+      const bumped = kdsOrders.splice(idx, 1)[0];
+      logAuditAction('KDS_BUMP', `Order ${bumped.id} marked as PREPARED and served by Kitchen Master.`);
+      renderKds();
+    }
+
+    // Leaderboard
+    function renderLeaderboard() {
+      const container = document.getElementById('staff-leaderboard-list');
+      container.innerHTML = staffLeaderboard.map((s, idx) => `
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-glass);">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--border-glass); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">
+              #${idx + 1}
+            </div>
+            <div>
+              <div style="font-size: 13px; font-weight: 600; color: #FFFFFF;">${s.name}</div>
+              <div style="font-size: 11px; color: var(--text-slate);">${s.role} &bull; ${s.count} Trx</div>
+            </div>
+          </div>
+          <div style="font-family: var(--font-mono); font-weight: 700; color: var(--cyan-neon);">
+            ${formatIdr(s.sales)}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // WhatsApp E-Receipt Dispatch
+    function openWhatsAppReceiptModal() {
+      const { grandTotal, subtotal, tax } = updateMeshTotals();
+      const textPreview = 
+`*KASIR AUTONOMOUS MESH*
+Node Outlet: ${currentBranch}
+Waktu: ${new Date().toLocaleString('id-ID')}
+--------------------------------
+${currentCart.length > 0 ? currentCart.map(i => `${i.name} (x${i.qty}) = ${formatIdr(i.price * i.qty)}`).join('\n') : '1x Cyber Velvet Iced Latte (Demo)'}
+--------------------------------
+Subtotal: ${formatIdr(subtotal || 32000)}
+Pajak (10%): ${formatIdr(tax || 3200)}
+*TOTAL TAGIHAN: ${formatIdr(grandTotal || 35200)}*
+--------------------------------
+Verifikasi Digital: https://pos.mesh/tx/${Date.now().toString(36)}
+Terima kasih atas kunjungan Anda!`;
+
+      document.getElementById('wa-receipt-preview').value = textPreview;
+      document.getElementById('wa-modal').classList.add('active');
+    }
+
+    function closeWaModal() {
+      document.getElementById('wa-modal').classList.remove('active');
+    }
+
+    function dispatchWhatsAppUrl() {
+      const phone = document.getElementById('wa-phone-input').value.trim();
+      const text = document.getElementById('wa-receipt-preview').value;
+      if (!phone) {
+        alert('Masukkan nomor WhatsApp tujuan');
+        return;
+      }
+      const encoded = encodeURIComponent(text);
+      const waUrl = `https://wa.me/${phone}?text=${encoded}`;
+      window.open(waUrl, '_blank');
+      closeWaModal();
+      logAuditAction('WA_DISPATCH', `Digital e-receipt dispatched to customer WhatsApp ${phone}`);
+    }
+
+    // Cryptographic Tamper-Proof Audit Trail Logger (SHA-256 Chained)
+    async function logAuditAction(actionType, message) {
+      const prevHash = auditLogs.length > 0 ? auditLogs[0].hash : 'GENESIS_00000000000000000000';
+      const timestamp = new Date().toISOString();
+      const payload = `${prevHash}|${timestamp}|${currentRole}|${actionType}|${message}`;
+      
+      let hash = 'HASH_OFFLINE_' + Math.random().toString(36).substr(2, 8);
+      if (window.crypto && window.crypto.subtle) {
+        const buffer = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(payload));
+        hash = Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 24).toUpperCase();
+      }
+
+      auditLogs.unshift({
+        timestamp: timestamp.split('T')[1].slice(0, 8),
+        role: currentRole,
+        actionType,
+        message,
+        hash
+      });
+
+      renderAuditTerminal();
+    }
+
+    function renderAuditTerminal() {
+      const terminal = document.getElementById('audit-log-terminal');
+      terminal.innerHTML = auditLogs.map(l => `
+        <div style="padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 8px;">
+          <span style="color: var(--cyan-neon);">[${l.timestamp}]</span>
+          <span style="color: var(--violet-neon); font-weight: 700;">[${l.role}]</span>
+          <span style="color: #FFFFFF;">${l.message}</span>
+          <span style="color: var(--text-slate); margin-left: auto;">HASH: ${l.hash}</span>
+        </div>
+      `).join('');
+    }
+
+    window.addEventListener('DOMContentLoaded', initAutonomousApp);
+  </script>
+</body>
+</html>

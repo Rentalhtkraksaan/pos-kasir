@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POS Starter Core — Tier 1 (Light Minimalist)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #F8FAFC;
+      --surface: #FFFFFF;
+      --border-color: #E2E8F0;
+      --border-focus: #CBD5E1;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --text-subtle: #94A3B8;
+      
+      --primary: #2563EB;
+      --primary-hover: #1D4ED8;
+      --primary-light: #EFF6FF;
+      
+      --accent-green: #059669;
+      --accent-green-hover: #047857;
+      --accent-green-light: #ECFDF5;
+      
+      --danger: #DC2626;
+      --danger-light: #FEF2F2;
+      --warning: #D97706;
+
+      --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header Nav */
+    .topbar {
+      height: 64px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-ui);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-outline {
+      background: var(--surface);
+      border-color: var(--border-color);
+      color: var(--text-main);
+    }
+    .btn-outline:hover {
+      background: #F1F5F9;
+      border-color: var(--border-focus);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #FFFFFF;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-success {
+      background: var(--accent-green);
+      color: #FFFFFF;
+    }
+    .btn-success:hover {
+      background: var(--accent-green-hover);
+    }
+
+    .btn-danger {
+      background: var(--danger-light);
+      color: var(--danger);
+      border-color: rgba(220, 38, 38, 0.2);
+    }
+    .btn-danger:hover {
+      background: #FEE2E2;
+    }
+
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    /* Layout Split */
+    .app-container {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      flex: 1;
+      height: calc(100vh - 64px);
+    }
+
+    /* Left Panel: Catalog & Management */
+    .catalog-panel {
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .summary-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .metric-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .metric-value {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .metric-sub {
+      font-size: 11px;
+      color: var(--text-subtle);
+      margin-top: 4px;
+    }
+
+    /* Filter & Search Bar */
+    .toolbar-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-subtle);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-family: var(--font-ui);
+      font-size: 14px;
+      background: var(--surface);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .category-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .pill-btn {
+      background: var(--surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .pill-btn:hover {
+      background: #F1F5F9;
+      color: var(--text-main);
+    }
+    .pill-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+
+    /* Products Grid */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 16px;
+    }
+
+    .product-card {
+      background: var(--surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s, border-color 0.15s;
+      position: relative;
+    }
+    .product-card:hover {
+      border-color: var(--border-focus);
+      transform: translateY(-2px);
+    }
+
+    .product-sku {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-subtle);
+      margin-bottom: 4px;
+    }
+
+    .product-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .product-category-tag {
+      font-size: 11px;
+      color: var(--text-muted);
+      background: #F1F5F9;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 12px;
+      width: fit-content;
+    }
+
+    .product-pricing {
+      margin-bottom: 12px;
+    }
+
+    .product-sell-price {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .product-cost-price {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-subtle);
+    }
+
+    .stock-badge-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 12px;
+    }
+
+    .stock-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+    .stock-indicator.in-stock { color: var(--accent-green); }
+    .stock-indicator.low-stock { color: var(--warning); }
+    .stock-indicator.out-of-stock { color: var(--danger); }
+
+    .stock-adjust-btns {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stock-step-btn {
+      width: 26px;
+      height: 26px;
+      border: 1px solid var(--border-color);
+      background: var(--surface);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+    .stock-step-btn:hover {
+      background: #F1F5F9;
+      border-color: var(--border-focus);
+    }
+
+    .card-footer-btns {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    /* Right Panel: Sticky Cart */
+    .cart-panel {
+      background: var(--surface);
+      border-left: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 64px);
+      position: sticky;
+      top: 64px;
+    }
+
+    .cart-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cart-title {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cart-item-count {
+      background: #F1F5F9;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .cart-items-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .cart-empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-subtle);
+      text-align: center;
+      gap: 12px;
+    }
+
+    .cart-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .cart-item-info h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .cart-item-info span {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .cart-qty-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .qty-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .qty-btn:hover { background: #F8FAFC; }
+
+    .qty-val {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      width: 22px;
+      text-align: center;
+    }
+
+    .cart-item-subtotal {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      min-width: 72px;
+      text-align: right;
+    }
+
+    /* Cart Calculations & Checkout */
+    .cart-summary {
+      border-top: 1px solid var(--border-color);
+      padding: 18px 20px;
+      background: #FAFAFA;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .summary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .summary-row.total {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+      padding-top: 6px;
+      border-top: 1px dashed var(--border-color);
+    }
+
+    .summary-row .val {
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .summary-row.total .val {
+      font-size: 20px;
+      color: var(--primary);
+    }
+
+    /* Checkout Controls */
+    .checkout-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .tax-discount-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .input-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .compact-select, .compact-input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-ui);
+      font-size: 12px;
+      background: var(--surface);
+      outline: none;
+    }
+
+    /* Denominations */
+    .denom-chips {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .denom-btn {
+      background: var(--surface);
+      border: 1px solid var(--border-color);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 2px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.1s;
+    }
+    .denom-btn:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .cash-received-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cash-input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .change-display {
+      background: var(--accent-green-light);
+      border: 1px solid rgba(5, 150, 105, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-green);
+    }
+    .change-display .change-val {
+      font-family: var(--font-mono);
+      font-size: 16px;
+    }
+
+    .btn-pay {
+      background: var(--accent-green);
+      color: #FFFFFF;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.15s;
+    }
+    .btn-pay:hover:not(:disabled) {
+      background: var(--accent-green-hover);
+    }
+    .btn-pay:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 520px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .modal-close-btn:hover { background: #F1F5F9; }
+
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 75vh;
+      overflow-y: auto;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .form-input {
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-ui);
+      font-size: 14px;
+      outline: none;
+    }
+    .form-input:focus {
+      border-color: var(--primary);
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      background: #F8FAFC;
+    }
+
+    /* 58mm Thermal Print Layout Container */
+    #receipt-print-area {
+      display: none;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #receipt-print-area, #receipt-print-area * {
+        visibility: visible;
+      }
+      #receipt-print-area {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 58mm;
+        margin: 0;
+        padding: 4mm 3mm;
+        background: #FFFFFF;
+        color: #000000;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        line-height: 1.25;
+      }
+      .thermal-receipt {
+        width: 100%;
+      }
+      .thermal-header {
+        text-align: center;
+        border-bottom: 1px dashed #000;
+        padding-bottom: 6px;
+        margin-bottom: 6px;
+      }
+      .thermal-title {
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 2px;
+      }
+      .thermal-divider {
+        border-top: 1px dashed #000;
+        margin: 6px 0;
+      }
+      .thermal-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .thermal-table td {
+        padding: 2px 0;
+      }
+      .thermal-total-row {
+        font-weight: 700;
+      }
+      .thermal-footer {
+        text-align: center;
+        margin-top: 8px;
+        border-top: 1px dashed #000;
+        padding-top: 6px;
+        font-size: 9px;
+      }
+      .cut-boundary {
+        text-align: center;
+        font-size: 8px;
+        margin-top: 10px;
+        letter-spacing: 2px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="brand-section">
+      <div class="brand-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+        <span>KASIR STARTER</span>
+      </div>
+      <span class="brand-badge">Tier 1 &bull; Rp100.000</span>
+    </div>
+
+    <div class="topbar-actions">
+      <!-- Hardware Lock / License Status Indicator -->
+      <div id="license-status-badge" style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-family: var(--font-mono); padding: 5px 10px; border-radius: 6px; background: #ECFDF5; color: #059669; border: 1px solid rgba(5,150,105,0.2); cursor: pointer;" onclick="openHardwareLockModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span id="license-badge-text">LISENSI TERVERIFIKASI</span>
+      </div>
+
+      <button class="btn btn-outline" onclick="openProductModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+        Tambah Produk
+      </button>
+
+      <button class="btn btn-outline" onclick="exportSalesLogCsv()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+        Export CSV
+      </button>
+
+      <a href="../index.html" class="btn btn-outline" title="Kembali ke Master Portal">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Portal
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-container">
+    
+    <!-- Left Catalog Panel -->
+    <section class="catalog-panel">
+
+      <!-- Analytics Row -->
+      <div class="summary-cards-grid">
+        <div class="metric-card">
+          <div class="metric-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="1" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Total Omzet Hari Ini
+          </div>
+          <div class="metric-value" id="kpi-turnover">Rp 0</div>
+          <div class="metric-sub" id="kpi-orders-count">0 transaksi selesai</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            Laba Kotor (Gross Profit)
+          </div>
+          <div class="metric-value" style="color: var(--accent-green);" id="kpi-profit">Rp 0</div>
+          <div class="metric-sub">Penjualan - HPP Modal</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Produk Terlaris #1
+          </div>
+          <div class="metric-value" style="font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="kpi-top-product">-</div>
+          <div class="metric-sub" id="kpi-top-qty">0 terjual</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            Total Item Katalog
+          </div>
+          <div class="metric-value" id="kpi-total-items">0</div>
+          <div class="metric-sub" id="kpi-low-stock-alert">0 stok menipis (&lt;5)</div>
+        </div>
+      </div>
+
+      <!-- Toolbar: Search & Category Pills -->
+      <div class="toolbar-section">
+        <div class="search-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="21" y1="21" y2="16.65"/></svg>
+          <input type="text" id="catalog-search" class="search-input" placeholder="Cari nama barang atau kode SKU..." oninput="handleSearch(this.value)">
+        </div>
+
+        <div class="category-pills" id="category-pills-container">
+          <button class="pill-btn active" onclick="filterCategory('ALL')">Semua</button>
+          <button class="pill-btn" onclick="filterCategory('Kopi')">Kopi</button>
+          <button class="pill-btn" onclick="filterCategory('Makanan')">Makanan</button>
+          <button class="pill-btn" onclick="filterCategory('Minuman')">Minuman</button>
+          <button class="pill-btn" onclick="filterCategory('Snack')">Snack</button>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" id="products-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- Right Checkout Cart Panel -->
+    <aside class="cart-panel">
+      <div class="cart-header">
+        <div class="cart-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          <span>Keranjang Kasir</span>
+          <span class="cart-item-count" id="cart-item-count">0 Item</span>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="clearCart()" title="Kosongkan Keranjang">
+          Reset
+        </button>
+      </div>
+
+      <!-- Cart Items List -->
+      <div class="cart-items-list" id="cart-items-container">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Calculations & Checkout Box -->
+      <div class="cart-summary">
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span class="val" id="calc-subtotal">Rp 0</span>
+        </div>
+
+        <!-- Tax & Discount Toggles -->
+        <div class="tax-discount-row">
+          <div class="input-group">
+            <label class="input-label">Diskon</label>
+            <div style="display: flex; gap: 4px;">
+              <select id="discount-type" class="compact-select" style="width: 60px;" onchange="updateCartCalculations()">
+                <option value="NOMINAL">Rp</option>
+                <option value="PERCENT">%</option>
+              </select>
+              <input type="number" id="discount-val" class="compact-input" placeholder="0" min="0" value="0" oninput="updateCartCalculations()">
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label">Pajak (PB1/PPN)</label>
+            <select id="tax-select" class="compact-select" onchange="updateCartCalculations()">
+              <option value="0">Non-Pajak (0%)</option>
+              <option value="0.10">PB1 Resto (10%)</option>
+              <option value="0.11">PPN (11%)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="summary-row">
+          <span>Pajak Resto</span>
+          <span class="val" id="calc-tax">Rp 0</span>
+        </div>
+
+        <div class="summary-row total">
+          <span>Total Tagihan</span>
+          <span class="val" id="calc-total">Rp 0</span>
+        </div>
+
+        <!-- Quick Cash Denominations -->
+        <div class="input-group">
+          <label class="input-label">Pecahan Cepat Uang Diterima</label>
+          <div class="denom-chips">
+            <button class="denom-btn" onclick="applyExactCash()">Uang Pas</button>
+            <button class="denom-btn" onclick="setCashReceived(20000)">20k</button>
+            <button class="denom-btn" onclick="setCashReceived(50000)">50k</button>
+            <button class="denom-btn" onclick="setCashReceived(100000)">100k</button>
+          </div>
+        </div>
+
+        <!-- Cash Input -->
+        <div class="cash-received-box">
+          <input type="number" id="cash-input" class="cash-input" placeholder="Nominal Uang..." min="0" oninput="updateCartCalculations()">
+        </div>
+
+        <div class="change-display">
+          <span>Kembalian</span>
+          <span class="change-val" id="calc-change">Rp 0</span>
+        </div>
+
+        <button class="btn-pay" id="btn-submit-pay" onclick="executeCheckout()" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Selesaikan Transaksi & Cetak
+        </button>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Product Modal (Add / Edit) -->
+  <div class="modal-backdrop" id="product-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="product-modal-title">Tambah Produk Baru</h3>
+        <button class="modal-close-btn" onclick="closeProductModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="form-product-id">
+        <div class="form-group">
+          <label class="form-label">Kode SKU Produk</label>
+          <input type="text" id="form-product-sku" class="form-input" placeholder="Contoh: KOP-001">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nama Produk</label>
+          <input type="text" id="form-product-name" class="form-input" placeholder="Contoh: Americano Ice 250ml">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategori</label>
+          <select id="form-product-category" class="form-input">
+            <option value="Kopi">Kopi</option>
+            <option value="Makanan">Makanan</option>
+            <option value="Minuman">Minuman</option>
+            <option value="Snack">Snack</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Harga Modal (HPP)</label>
+            <input type="number" id="form-product-cost" class="form-input" placeholder="8000" min="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Harga Jual</label>
+            <input type="number" id="form-product-price" class="form-input" placeholder="18000" min="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stok Awal</label>
+          <input type="number" id="form-product-stock" class="form-input" placeholder="50" min="0">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeProductModal()">Batal</button>
+        <button class="btn btn-primary" onclick="saveProductForm()">Simpan Produk</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hardware Lock / License Activation Modal -->
+  <div class="modal-backdrop" id="hardware-lock-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary);"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Hardware Lock & Lisensi Perangkat
+        </h3>
+        <button class="modal-close-btn" onclick="closeHardwareLockModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="background: #F8FAFC; border: 1px solid var(--border-color); padding: 14px; border-radius: var(--radius-md);">
+          <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">Hardware Machine-ID Perangkat Ini:</div>
+          <div id="modal-machine-id" style="font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--primary); letter-spacing: 0.05em;">MACH-CALCULATING...</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Serial License Key (16-karakter signature):</label>
+          <input type="text" id="license-input-key" class="form-input" placeholder="POS-T1-9999999999-XXXXXXXX-XXXXXXXXXXXXXXXX" style="font-family: var(--font-mono); font-size: 13px;">
+          <small style="color: var(--text-muted); font-size: 11px;">Format: POS-[TIER]-[EXPIRE]-[SALT]-[SIGNATURE]. Kunci ditandatangani oleh Reseller Panel.</small>
+        </div>
+
+        <div id="license-validation-result" style="display: none; padding: 10px 12px; border-radius: var(--radius-sm); font-size: 12px;"></div>
+
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-outline btn-sm" onclick="autoGenerateDemoKey()" style="flex: 1;">
+            Generate Kunci Demo Otomatis
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeHardwareLockModal()">Tutup</button>
+        <button class="btn btn-primary" onclick="submitActivateLicense()">Aktivasi Lisensi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thermal 58mm Printable Receipt Container -->
+  <div id="receipt-print-area">
+    <div class="thermal-receipt" id="thermal-receipt-content">
+      <!-- Injected during print -->
+    </div>
+  </div>
+
+  <!-- Load Security Core -->
+  <script src="../js/license-core.js"></script>
+
+  <script>
+    /**
+     * TIER 1: STARTER CORE POS LOGIC (100% OFFLINE-FIRST)
+     */
+    const STORAGE_KEY_PRODUCTS = 'KASIR_T1_PRODUCTS';
+    const STORAGE_KEY_SALES = 'KASIR_T1_SALES';
+    const STORAGE_KEY_LICENSE = 'KASIR_T1_ACTIVE_LICENSE';
+
+    // Default Seed Products
+    const DEFAULT_PRODUCTS = [
+      { id: 'P1', sku: 'KOP-001', name: 'Kopi Susu Gula Aren', category: 'Kopi', cost: 7000, price: 18000, stock: 45 },
+      { id: 'P2', sku: 'KOP-002', name: 'Americano Ice 250ml', category: 'Kopi', cost: 5000, price: 15000, stock: 38 },
+      { id: 'P3', sku: 'MAK-001', name: 'Nasi Goreng Spesial', category: 'Makanan', cost: 12000, price: 25000, stock: 20 },
+      { id: 'P4', sku: 'MAK-002', name: 'Mie Goreng Telur', category: 'Makanan', cost: 9000, price: 18000, stock: 15 },
+      { id: 'P5', sku: 'MIN-001', name: 'Es Teh Manis Jumbo', category: 'Minuman', cost: 2500, price: 6000, stock: 80 },
+      { id: 'P6', sku: 'SNK-001', name: 'Kentang Goreng Crispy', category: 'Snack', cost: 6000, price: 14000, stock: 4 } // Low stock example
+    ];
+
+    let products = [];
+    let sales = [];
+    let cart = [];
+    let activeCategory = 'ALL';
+    let searchQuery = '';
+    let currentMachineId = '';
+
+    // Format Currency IDR
+    function formatIdr(amount) {
+      return 'Rp ' + Number(amount || 0).toLocaleString('id-ID');
+    }
+
+    // Initialize Application
+    async function initApp() {
+      loadStorage();
+      renderCategoryPills();
+      renderProducts();
+      renderCart();
+      updateAnalytics();
+
+      // Initialize Machine ID & License
+      if (window.KasirSecurity) {
+        currentMachineId = await window.KasirSecurity.MachineFingerprint.generateMachineId();
+        document.getElementById('modal-machine-id').textContent = currentMachineId;
+        verifyStoredLicense();
+      }
+    }
+
+    // Storage Loader
+    function loadStorage() {
+      try {
+        const prodData = localStorage.getItem(STORAGE_KEY_PRODUCTS);
+        products = prodData ? JSON.parse(prodData) : DEFAULT_PRODUCTS;
+        if (!prodData) saveProducts();
+
+        const salesData = localStorage.getItem(STORAGE_KEY_SALES);
+        sales = salesData ? JSON.parse(salesData) : [];
+      } catch (e) {
+        products = DEFAULT_PRODUCTS;
+        sales = [];
+      }
+    }
+
+    function saveProducts() {
+      localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
+    }
+
+    function saveSales() {
+      localStorage.setItem(STORAGE_KEY_SALES, JSON.stringify(sales));
+    }
+
+    // Filter Category
+    function filterCategory(cat) {
+      activeCategory = cat;
+      const buttons = document.querySelectorAll('#category-pills-container .pill-btn');
+      buttons.forEach(btn => {
+        if (btn.textContent.trim().toUpperCase() === (cat === 'ALL' ? 'SEMUA' : cat.toUpperCase())) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      renderProducts();
+    }
+
+    // Live Search
+    function handleSearch(q) {
+      searchQuery = q.toLowerCase().trim();
+      renderProducts();
+    }
+
+    // Render Products Grid
+    function renderProducts() {
+      const container = document.getElementById('products-grid');
+      const filtered = products.filter(p => {
+        const matchesCat = activeCategory === 'ALL' || p.category.toLowerCase() === activeCategory.toLowerCase();
+        const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery) || p.sku.toLowerCase().includes(searchQuery);
+        return matchesCat && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 48px; color: var(--text-muted);">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 8px; color: var(--text-subtle);"><circle cx="11" cy="11" r="8"/><line x1="21" x2="21" y1="21" y2="16.65"/></svg>
+            <p>Tidak ada produk yang cocok dengan pencarian.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(p => {
+        const isOutOfStock = p.stock <= 0;
+        const isLowStock = p.stock > 0 && p.stock <= 5;
+        const stockClass = isOutOfStock ? 'out-of-stock' : (isLowStock ? 'low-stock' : 'in-stock');
+        const stockText = isOutOfStock ? 'Habis' : (isLowStock ? `Sisa ${p.stock}` : `Stok: ${p.stock}`);
+
+        return `
+          <div class="product-card">
+            <div>
+              <div class="product-sku">${p.sku}</div>
+              <h3 class="product-title">${p.name}</h3>
+              <span class="product-category-tag">${p.category}</span>
+              <div class="product-pricing">
+                <div class="product-sell-price">${formatIdr(p.price)}</div>
+                <div class="product-cost-price">HPP: ${formatIdr(p.cost)}</div>
+              </div>
+            </div>
+
+            <div>
+              <div class="stock-badge-row">
+                <span class="stock-indicator ${stockClass}">
+                  <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:currentColor;"></span>
+                  ${stockText}
+                </span>
+                <div class="stock-adjust-btns">
+                  <button class="stock-step-btn" title="Kurangi Stok" onclick="adjustProductStock('${p.id}', -1)">-</button>
+                  <button class="stock-step-btn" title="Tambah Stok" onclick="adjustProductStock('${p.id}', 1)">+</button>
+                </div>
+              </div>
+
+              <div class="card-footer-btns">
+                <button class="btn btn-primary" onclick="addToCart('${p.id}')" ${isOutOfStock ? 'disabled' : ''}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                  + Keranjang
+                </button>
+                <button class="btn btn-outline" style="padding: 8px 10px;" title="Edit Produk" onclick="editProduct('${p.id}')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Dynamic Category Pills
+    function renderCategoryPills() {
+      const categories = ['ALL', ...new Set(products.map(p => p.category))];
+      const container = document.getElementById('category-pills-container');
+      container.innerHTML = categories.map(cat => `
+        <button class="pill-btn ${cat === activeCategory ? 'active' : ''}" onclick="filterCategory('${cat}')">
+          ${cat === 'ALL' ? 'Semua' : cat}
+        </button>
+      `).join('');
+    }
+
+    // Quick Stock Adjuster (+ / -)
+    function adjustProductStock(productId, delta) {
+      const prod = products.find(p => p.id === productId);
+      if (!prod) return;
+      prod.stock = Math.max(0, prod.stock + delta);
+      saveProducts();
+      renderProducts();
+      updateAnalytics();
+    }
+
+    // Cart Operations
+    function addToCart(productId) {
+      const prod = products.find(p => p.id === productId);
+      if (!prod || prod.stock <= 0) return;
+
+      const existing = cart.find(item => item.id === productId);
+      if (existing) {
+        if (existing.qty < prod.stock) {
+          existing.qty += 1;
+        } else {
+          alert('Mencapai batas stok yang tersedia (' + prod.stock + ')');
+        }
+      } else {
+        cart.push({
+          id: prod.id,
+          sku: prod.sku,
+          name: prod.name,
+          price: prod.price,
+          cost: prod.cost,
+          qty: 1
+        });
+      }
+      renderCart();
+    }
+
+    function updateCartQty(productId, delta) {
+      const itemIndex = cart.findIndex(i => i.id === productId);
+      if (itemIndex === -1) return;
+
+      const prod = products.find(p => p.id === productId);
+      const newQty = cart[itemIndex].qty + delta;
+
+      if (newQty <= 0) {
+        cart.splice(itemIndex, 1);
+      } else if (prod && newQty > prod.stock) {
+        alert('Stok tidak mencukupi');
+      } else {
+        cart[itemIndex].qty = newQty;
+      }
+      renderCart();
+    }
+
+    function clearCart() {
+      cart = [];
+      document.getElementById('cash-input').value = '';
+      renderCart();
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cart-items-container');
+      const countEl = document.getElementById('cart-item-count');
+      const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+      countEl.textContent = `${totalItems} Item`;
+
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="cart-empty-state">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+            <p>Keranjang masih kosong.<br>Klik item di katalog untuk menambahkan.</p>
+          </div>
+        `;
+        updateCartCalculations();
+        return;
+      }
+
+      container.innerHTML = cart.map(item => `
+        <div class="cart-item">
+          <div class="cart-item-info">
+            <h4>${item.name}</h4>
+            <span>${formatIdr(item.price)} &times; ${item.qty}</span>
+          </div>
+          <div class="cart-qty-ctrl">
+            <button class="qty-btn" onclick="updateCartQty('${item.id}', -1)">-</button>
+            <span class="qty-val">${item.qty}</span>
+            <button class="qty-btn" onclick="updateCartQty('${item.id}', 1)">+</button>
+          </div>
+          <div class="cart-item-subtotal">${formatIdr(item.price * item.qty)}</div>
+        </div>
+      `).join('');
+
+      updateCartCalculations();
+    }
+
+    // Calculations
+    function updateCartCalculations() {
+      const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+      
+      // Discount
+      const discType = document.getElementById('discount-type').value;
+      const discValInput = parseFloat(document.getElementById('discount-val').value) || 0;
+      let discountAmount = 0;
+      if (discType === 'PERCENT') {
+        discountAmount = (subtotal * Math.min(100, Math.max(0, discValInput))) / 100;
+      } else {
+        discountAmount = Math.min(subtotal, Math.max(0, discValInput));
+      }
+
+      const taxableAmount = Math.max(0, subtotal - discountAmount);
+
+      // Tax
+      const taxRate = parseFloat(document.getElementById('tax-select').value) || 0;
+      const taxAmount = Math.round(taxableAmount * taxRate);
+
+      const grandTotal = taxableAmount + taxAmount;
+
+      document.getElementById('calc-subtotal').textContent = formatIdr(subtotal);
+      document.getElementById('calc-tax').textContent = formatIdr(taxAmount);
+      document.getElementById('calc-total').textContent = formatIdr(grandTotal);
+
+      // Cash & Change
+      const cashVal = parseFloat(document.getElementById('cash-input').value) || 0;
+      const change = cashVal - grandTotal;
+      const changeEl = document.getElementById('calc-change');
+      const submitBtn = document.getElementById('btn-submit-pay');
+
+      if (cart.length > 0 && cashVal >= grandTotal) {
+        changeEl.textContent = formatIdr(change);
+        submitBtn.disabled = false;
+      } else {
+        changeEl.textContent = cashVal > 0 ? 'Kurang ' + formatIdr(Math.abs(change)) : 'Rp 0';
+        submitBtn.disabled = cart.length === 0 || cashVal < grandTotal;
+      }
+
+      return { subtotal, discountAmount, taxAmount, grandTotal, cashVal, change };
+    }
+
+    // Denominations Helpers
+    function applyExactCash() {
+      const { grandTotal } = updateCartCalculations();
+      document.getElementById('cash-input').value = grandTotal;
+      updateCartCalculations();
+    }
+
+    function setCashReceived(amount) {
+      document.getElementById('cash-input').value = amount;
+      updateCartCalculations();
+    }
+
+    // POS Checkout & Thermal Print Execution
+    function executeCheckout() {
+      const calc = updateCartCalculations();
+      if (cart.length === 0 || calc.cashVal < calc.grandTotal) return;
+
+      // 1. Deduct Inventory Stock
+      cart.forEach(cartItem => {
+        const prod = products.find(p => p.id === cartItem.id);
+        if (prod) {
+          prod.stock = Math.max(0, prod.stock - cartItem.qty);
+        }
+      });
+      saveProducts();
+
+      // 2. Record Transaction
+      const transactionId = 'TRX-' + Date.now().toString(36).toUpperCase();
+      const transaction = {
+        id: transactionId,
+        date: new Date().toISOString(),
+        items: [...cart],
+        subtotal: calc.subtotal,
+        discount: calc.discountAmount,
+        tax: calc.taxAmount,
+        grandTotal: calc.grandTotal,
+        cashPaid: calc.cashVal,
+        change: calc.change,
+        // Calculate Profit for this transaction
+        grossProfit: cart.reduce((acc, i) => acc + ((i.price - i.cost) * i.qty), 0) - calc.discountAmount
+      };
+
+      sales.unshift(transaction);
+      saveSales();
+
+      // 3. Generate 58mm Thermal Receipt Content
+      generateThermalReceipt(transaction);
+
+      // 4. Trigger window.print()
+      setTimeout(() => {
+        window.print();
+      }, 100);
+
+      // Reset
+      clearCart();
+      renderProducts();
+      updateAnalytics();
+    }
+
+    // Standardized 58mm Thermal Receipt Template
+    function generateThermalReceipt(trx) {
+      const printContainer = document.getElementById('thermal-receipt-content');
+      const nowStr = new Date(trx.date).toLocaleString('id-ID', {
+        dateStyle: 'short',
+        timeStyle: 'medium'
+      });
+
+      const itemsHtml = trx.items.map(item => `
+        <tr>
+          <td colspan="2" style="font-weight:600;">${item.name}</td>
+        </tr>
+        <tr>
+          <td style="color:#333;">${item.qty} x ${formatIdr(item.price)}</td>
+          <td style="text-align:right;">${formatIdr(item.price * item.qty)}</td>
+        </tr>
+      `).join('');
+
+      printContainer.innerHTML = `
+        <div class="thermal-header">
+          <div class="thermal-title">KASIR STARTER POS</div>
+          <div>Jl. Boulevard Barat No. 88, Jakarta</div>
+          <div>Telp: 0812-3456-7890</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:9px;">
+          <span>No: ${trx.id}</span>
+          <span>${nowStr}</span>
+        </div>
+        <div class="thermal-divider"></div>
+        <table class="thermal-table">
+          <tbody>
+            ${itemsHtml}
+          </tbody>
+        </table>
+        <div class="thermal-divider"></div>
+        <table class="thermal-table">
+          <tbody>
+            <tr>
+              <td>Subtotal</td>
+              <td style="text-align:right;">${formatIdr(trx.subtotal)}</td>
+            </tr>
+            ${trx.discount > 0 ? `
+            <tr>
+              <td>Diskon</td>
+              <td style="text-align:right;">-${formatIdr(trx.discount)}</td>
+            </tr>` : ''}
+            ${trx.tax > 0 ? `
+            <tr>
+              <td>Pajak (PB1)</td>
+              <td style="text-align:right;">${formatIdr(trx.tax)}</td>
+            </tr>` : ''}
+            <tr class="thermal-total-row" style="font-size:11px;">
+              <td style="padding-top:4px;">TOTAL</td>
+              <td style="text-align:right; padding-top:4px;">${formatIdr(trx.grandTotal)}</td>
+            </tr>
+            <tr>
+              <td>Tunai Diterima</td>
+              <td style="text-align:right;">${formatIdr(trx.cashPaid)}</td>
+            </tr>
+            <tr>
+              <td>Kembalian</td>
+              <td style="text-align:right;">${formatIdr(trx.change)}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="thermal-footer">
+          <div>Terima Kasih Atas Kunjungan Anda!</div>
+          <div>Barang yang dibeli tidak dapat ditukar</div>
+        </div>
+        <div class="cut-boundary">- - - - - - GUNTING DI SINI - - - - - -</div>
+      `;
+    }
+
+    // Daily Sales Analytics
+    function updateAnalytics() {
+      // 1. Turnover & Orders
+      const totalTurnover = sales.reduce((acc, s) => acc + s.grandTotal, 0);
+      document.getElementById('kpi-turnover').textContent = formatIdr(totalTurnover);
+      document.getElementById('kpi-orders-count').textContent = `${sales.length} transaksi selesai`;
+
+      // 2. Gross Profit (Selling Price - Cost Price)
+      const totalProfit = sales.reduce((acc, s) => acc + (s.grossProfit || 0), 0);
+      document.getElementById('kpi-profit').textContent = formatIdr(totalProfit);
+
+      // 3. Top 3 Bestselling items
+      const itemMap = {};
+      sales.forEach(s => {
+        s.items.forEach(item => {
+          itemMap[item.name] = (itemMap[item.name] || 0) + item.qty;
+        });
+      });
+
+      const sortedItems = Object.entries(itemMap).sort((a, b) => b[1] - a[1]);
+      if (sortedItems.length > 0) {
+        document.getElementById('kpi-top-product').textContent = sortedItems[0][0];
+        document.getElementById('kpi-top-qty').textContent = `${sortedItems[0][1]} item terjual`;
+      } else {
+        document.getElementById('kpi-top-product').textContent = '-';
+        document.getElementById('kpi-top-qty').textContent = '0 terjual';
+      }
+
+      // 4. Catalog & Low Stock Alert
+      document.getElementById('kpi-total-items').textContent = products.length;
+      const lowStockCount = products.filter(p => p.stock < 5).length;
+      document.getElementById('kpi-low-stock-alert').textContent = `${lowStockCount} stok menipis (<5)`;
+    }
+
+    // Export Sales Log to CSV
+    function exportSalesLogCsv() {
+      if (sales.length === 0) {
+        alert('Belum ada data transaksi untuk diexport.');
+        return;
+      }
+
+      const headers = ['ID_Transaksi', 'Waktu', 'Item_Ringkasan', 'Subtotal', 'Diskon', 'Pajak', 'Grand_Total', 'Laba_Kotor'];
+      const rows = sales.map(s => [
+        s.id,
+        `"${s.date}"`,
+        `"${s.items.map(i => `${i.name} (x${i.qty})`).join('; ')}"`,
+        s.subtotal,
+        s.discount,
+        s.tax,
+        s.grandTotal,
+        s.grossProfit
+      ]);
+
+      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Sales_Log_Starter_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Product Modal Operations
+    function openProductModal(prod = null) {
+      document.getElementById('product-modal').classList.add('active');
+      if (prod) {
+        document.getElementById('product-modal-title').textContent = 'Edit Produk';
+        document.getElementById('form-product-id').value = prod.id;
+        document.getElementById('form-product-sku').value = prod.sku;
+        document.getElementById('form-product-name').value = prod.name;
+        document.getElementById('form-product-category').value = prod.category;
+        document.getElementById('form-product-cost').value = prod.cost;
+        document.getElementById('form-product-price').value = prod.price;
+        document.getElementById('form-product-stock').value = prod.stock;
+      } else {
+        document.getElementById('product-modal-title').textContent = 'Tambah Produk Baru';
+        document.getElementById('form-product-id').value = '';
+        document.getElementById('form-product-sku').value = 'PRD-' + Math.floor(100 + Math.random() * 900);
+        document.getElementById('form-product-name').value = '';
+        document.getElementById('form-product-cost').value = '';
+        document.getElementById('form-product-price').value = '';
+        document.getElementById('form-product-stock').value = '20';
+      }
+    }
+
+    function editProduct(id) {
+      const prod = products.find(p => p.id === id);
+      if (prod) openProductModal(prod);
+    }
+
+    function closeProductModal() {
+      document.getElementById('product-modal').classList.remove('active');
+    }
+
+    function saveProductForm() {
+      const id = document.getElementById('form-product-id').value;
+      const sku = document.getElementById('form-product-sku').value.trim();
+      const name = document.getElementById('form-product-name').value.trim();
+      const category = document.getElementById('form-product-category').value;
+      const cost = parseFloat(document.getElementById('form-product-cost').value) || 0;
+      const price = parseFloat(document.getElementById('form-product-price').value) || 0;
+      const stock = parseInt(document.getElementById('form-product-stock').value, 10) || 0;
+
+      if (!name || price <= 0) {
+        alert('Nama produk dan harga jual wajib diisi');
+        return;
+      }
+
+      if (id) {
+        const prod = products.find(p => p.id === id);
+        if (prod) {
+          prod.sku = sku;
+          prod.name = name;
+          prod.category = category;
+          prod.cost = cost;
+          prod.price = price;
+          prod.stock = stock;
+        }
+      } else {
+        products.unshift({
+          id: 'P_' + Date.now(),
+          sku: sku || 'PRD-' + Date.now().toString().slice(-4),
+          name,
+          category,
+          cost,
+          price,
+          stock
+        });
+      }
+
+      saveProducts();
+      closeProductModal();
+      renderCategoryPills();
+      renderProducts();
+      updateAnalytics();
+    }
+
+    // Hardware Lock & License Management
+    function openHardwareLockModal() {
+      document.getElementById('hardware-lock-modal').classList.add('active');
+    }
+
+    function closeHardwareLockModal() {
+      document.getElementById('hardware-lock-modal').classList.remove('active');
+    }
+
+    async function verifyStoredLicense() {
+      const storedKey = localStorage.getItem(STORAGE_KEY_LICENSE);
+      const badge = document.getElementById('license-badge-text');
+      const badgeContainer = document.getElementById('license-status-badge');
+
+      if (!storedKey) {
+        badge.textContent = 'DEMO TIER 1 (UNLOCKED)';
+        badgeContainer.style.background = '#EFF6FF';
+        badgeContainer.style.color = '#2563EB';
+        return;
+      }
+
+      const res = await window.KasirSecurity.LicenseEngine.verifyLicenseKey(storedKey, currentMachineId);
+      if (res.valid) {
+        badge.textContent = 'LISENSI AKTIF: ' + res.tierName;
+        badgeContainer.style.background = '#ECFDF5';
+        badgeContainer.style.color = '#059669';
+      } else {
+        badge.textContent = 'LISENSI TIDAK VALID';
+        badgeContainer.style.background = '#FEF2F2';
+        badgeContainer.style.color = '#DC2626';
+      }
+    }
+
+    async function autoGenerateDemoKey() {
+      if (!window.KasirSecurity || !currentMachineId) return;
+      const key = await window.KasirSecurity.LicenseEngine.generateLicenseKey('T1', currentMachineId, 'LIFETIME');
+      document.getElementById('license-input-key').value = key;
+    }
+
+    async function submitActivateLicense() {
+      const keyInput = document.getElementById('license-input-key').value.trim();
+      const resultBox = document.getElementById('license-validation-result');
+
+      if (!keyInput) {
+        alert('Masukkan serial key terlebih dahulu');
+        return;
+      }
+
+      const res = await window.KasirSecurity.LicenseEngine.verifyLicenseKey(keyInput, currentMachineId);
+      resultBox.style.display = 'block';
+
+      if (res.valid) {
+        resultBox.style.background = '#ECFDF5';
+        resultBox.style.color = '#059669';
+        resultBox.textContent = `Aktivasi Berhasil! Lisensi terverifikasi untuk ${res.tierName}. Status: Seumur Hidup.`;
+        localStorage.setItem(STORAGE_KEY_LICENSE, keyInput);
+        verifyStoredLicense();
+        setTimeout(closeHardwareLockModal, 1500);
+      } else {
+        resultBox.style.background = '#FEF2F2';
+        resultBox.style.color = '#DC2626';
+        resultBox.textContent = `Gagal: ${res.reason}`;
+      }
+    }
+
+    // Startup
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>

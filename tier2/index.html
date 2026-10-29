@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POS Business Studio — Tier 2 (Hybrid Slate)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0F172A; /* Cool Zinc */
+      --bg-surface: #1E293B; /* Deep Titanium */
+      --bg-card: #243046;
+      --bg-card-hover: #2D3B55;
+      --border-color: #334155;
+      --border-bright: #475569;
+      
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-subtle: #64748B;
+      
+      --indigo: #6366F1;
+      --indigo-hover: #4F46E5;
+      --indigo-glow: rgba(99, 102, 241, 0.25);
+      
+      --emerald: #10B981;
+      --emerald-glow: rgba(16, 185, 129, 0.2);
+      
+      --amber: #F59E0B;
+      --amber-glow: rgba(245, 158, 11, 0.2);
+      
+      --rose: #F43F5E;
+      --rose-glow: rgba(244, 63, 94, 0.2);
+
+      --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-elevation: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navigation */
+    .topbar {
+      height: 64px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--indigo), #8B5CF6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px var(--indigo-glow);
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tier-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(99, 102, 241, 0.15);
+      color: #A5B4FC;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    /* Nav Tabs */
+    .nav-tabs {
+      display: flex;
+      background: var(--bg-dark);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      gap: 4px;
+    }
+
+    .nav-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-ui);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+    .nav-tab-btn:hover {
+      color: var(--text-main);
+    }
+    .nav-tab-btn.active {
+      background: var(--indigo);
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px var(--indigo-glow);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Role Pill Switcher */
+    .role-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s;
+    }
+    .role-badge.cashier {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: var(--emerald);
+    }
+    .role-badge.owner {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.4);
+      color: #C7D2FE;
+    }
+
+    /* Print Paper Size Selector */
+    .print-mode-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: var(--bg-dark);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-ui);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border-color: var(--border-color);
+      color: var(--text-main);
+    }
+    .btn-outline:hover {
+      background: var(--bg-card);
+      border-color: var(--border-bright);
+    }
+
+    .btn-primary {
+      background: var(--indigo);
+      color: #FFFFFF;
+    }
+    .btn-primary:hover {
+      background: var(--indigo-hover);
+    }
+
+    .btn-emerald {
+      background: var(--emerald);
+      color: #FFFFFF;
+    }
+    .btn-emerald:hover {
+      background: #059669;
+    }
+
+    .btn-rose {
+      background: rgba(244, 63, 94, 0.15);
+      color: var(--rose);
+      border-color: rgba(244, 63, 94, 0.3);
+    }
+    .btn-rose:hover {
+      background: rgba(244, 63, 94, 0.25);
+    }
+
+    /* Main Container Viewport */
+    .main-viewport {
+      flex: 1;
+      display: flex;
+      height: calc(100vh - 64px);
+      position: relative;
+    }
+
+    .tab-content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: none;
+    }
+    .tab-content-area.active {
+      display: block;
+    }
+
+    /* TAB 1: CATALOG MODE */
+    .catalog-layout {
+      display: grid;
+      grid-template-columns: 1fr 430px;
+      gap: 24px;
+      height: 100%;
+    }
+
+    .catalog-main {
+      overflow-y: auto;
+      padding-right: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .catalog-toolbar {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+    }
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-subtle);
+    }
+    .search-input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      font-size: 14px;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 2px var(--indigo-glow);
+    }
+
+    .category-pills {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+    }
+    .cat-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .cat-btn.active {
+      background: var(--indigo);
+      border-color: var(--indigo);
+      color: #FFFFFF;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .product-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    .product-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--indigo);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-elevation);
+    }
+
+    .variant-indicator {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(99, 102, 241, 0.15);
+      color: #A5B4FC;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .prod-sku {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-subtle);
+    }
+
+    .prod-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin: 4px 0 8px;
+      line-height: 1.3;
+    }
+
+    .prod-price {
+      font-family: var(--font-mono);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 14px;
+    }
+
+    .cart-sidebar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .cart-header {
+      padding: 16px 20px;
+      background: var(--bg-dark);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .table-bind-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--amber);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .cart-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .cart-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .cart-item-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .cart-item-modifiers {
+      font-size: 11px;
+      color: var(--indigo);
+      margin-top: 2px;
+    }
+
+    .cart-item-price {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .cart-qty-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .qty-step-btn {
+      width: 24px;
+      height: 24px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .qty-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .cart-subtotal {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 70px;
+      text-align: right;
+    }
+
+    .cart-billing-footer {
+      padding: 16px 20px;
+      background: var(--bg-dark);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .bill-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .bill-row .val {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .bill-row.grand-total {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+      border-top: 1px dashed var(--border-color);
+      padding-top: 6px;
+    }
+    .bill-row.grand-total .val {
+      color: var(--indigo);
+      font-size: 18px;
+    }
+
+    .payment-type-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .pay-type-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-align: center;
+    }
+    .pay-type-btn.active {
+      background: var(--indigo);
+      border-color: var(--indigo);
+    }
+
+    .checkout-action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    /* TAB 2: TABLE MAP (DINE-IN) */
+    .table-map-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .table-legend {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .legend-dot.empty { background: var(--emerald); }
+    .legend-dot.dining { background: var(--amber); }
+    .legend-dot.waiting { background: var(--indigo); }
+
+    .tables-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .table-card {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .table-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-elevation);
+    }
+    .table-card.empty { border-color: rgba(16, 185, 129, 0.4); }
+    .table-card.dining { border-color: rgba(245, 158, 11, 0.6); background: rgba(245, 158, 11, 0.05); }
+    .table-card.waiting { border-color: rgba(99, 102, 241, 0.6); background: rgba(99, 102, 241, 0.05); }
+
+    .table-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .table-number {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .table-status-pill {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 999px;
+    }
+    .table-card.empty .table-status-pill { background: rgba(16, 185, 129, 0.2); color: var(--emerald); }
+    .table-card.dining .table-status-pill { background: rgba(245, 158, 11, 0.2); color: var(--amber); }
+    .table-card.waiting .table-status-pill { background: rgba(99, 102, 241, 0.2); color: #A5B4FC; }
+
+    .table-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .table-amount {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 6px;
+    }
+
+    /* TAB 3: SHIFT SUMMARY & CASH DRAWER RECONCILIATION */
+    .shift-dashboard {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .shift-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .shift-kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+
+    .shift-kpi-card .label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .shift-kpi-card .val {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .reconciliation-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .reconciliation-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 14px;
+    }
+
+    .audit-diff-box {
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .audit-diff-box.balanced {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--emerald);
+    }
+    .audit-diff-box.shortage {
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      color: var(--rose);
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-bright);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 520px;
+      box-shadow: var(--shadow-elevation);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 75vh;
+      overflow-y: auto;
+    }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-dark);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      font-size: 14px;
+      outline: none;
+    }
+    .input-field:focus {
+      border-color: var(--indigo);
+    }
+
+    /* Multi-Slip Thermal Printing Section */
+    #thermal-print-area {
+      display: none;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #thermal-print-area, #thermal-print-area * {
+        visibility: visible;
+      }
+      #thermal-print-area {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        margin: 0;
+        padding: 0;
+        color: #000;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* 58mm width */
+      .thermal-slip-58 {
+        width: 58mm;
+        padding: 4mm 3mm;
+        font-size: 10px;
+        page-break-after: always;
+      }
+
+      /* 80mm width */
+      .thermal-slip-80 {
+        width: 80mm;
+        padding: 6mm 4mm;
+        font-size: 12px;
+        page-break-after: always;
+      }
+
+      .slip-title {
+        font-size: 14px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 2px;
+      }
+      .slip-center { text-align: center; }
+      .slip-divider {
+        border-top: 1px dashed #000;
+        margin: 6px 0;
+      }
+      .slip-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .slip-table td {
+        padding: 2px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <div class="brand-group">
+      <div class="logo-badge">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/></svg>
+      </div>
+      <div class="brand-title">
+        BUSINESS STUDIO
+        <span class="tier-badge">Tier 2 &bull; Rp450.000</span>
+      </div>
+    </div>
+
+    <!-- Mode Tabs -->
+    <nav class="nav-tabs">
+      <button class="nav-tab-btn active" id="tab-btn-catalog" onclick="switchTab('catalog')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+        Katalog Kasir
+      </button>
+      <button class="nav-tab-btn" id="tab-btn-tables" onclick="switchTab('tables')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 9h6"/><path d="M9 13h6"/></svg>
+        Dine-In Meja (12)
+      </button>
+      <button class="nav-tab-btn" id="tab-btn-shift" onclick="switchTab('shift')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Rekonsiliasi Shift
+      </button>
+    </nav>
+
+    <!-- Right Controls -->
+    <div class="topbar-right">
+      <!-- Paper Format Toggle (58mm / 80mm) -->
+      <select id="thermal-width-select" class="print-mode-pill" title="Format Lebar Printer Thermal">
+        <option value="58mm">Thermal 58mm</option>
+        <option value="80mm" selected>Thermal 80mm</option>
+      </select>
+
+      <!-- Dual Role Indicator / Switcher -->
+      <div class="role-badge cashier" id="role-toggle-badge" onclick="toggleRoleAuth()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="role-label">KASIR MODE</span>
+      </div>
+
+      <!-- Backup Engine Button (Owner only or PIN prompt) -->
+      <button class="btn btn-outline" onclick="triggerBackupEngine()" title="Export JSON / Local Backup">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+        Backup
+      </button>
+
+      <a href="../index.html" class="btn btn-outline" title="Kembali ke Portal Pusat">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Portal
+      </a>
+    </div>
+  </header>
+
+  <!-- Viewport -->
+  <main class="main-viewport">
+    
+    <!-- ================================================================== -->
+    <!-- TAB 1: CATALOG MODE -->
+    <!-- ================================================================== -->
+    <div class="tab-content-area active" id="tab-catalog" style="padding: 20px;">
+      <div class="catalog-layout">
+        
+        <!-- Left: Products Grid -->
+        <div class="catalog-main">
+          <div class="catalog-toolbar">
+            <div class="search-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="21" y1="21" y2="16.65"/></svg>
+              <input type="text" id="catalog-search" class="search-input" placeholder="Cari menu, varian, atau SKU..." oninput="handleSearch(this.value)">
+            </div>
+            <div class="category-pills" id="category-pills">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <div class="products-grid" id="products-grid">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Right: Cart & Active Table Bill -->
+        <div class="cart-sidebar">
+          <div class="cart-header">
+            <div>
+              <div style="font-size: 14px; font-weight: 700; color: #FFFFFF;">Pesanan Aktif</div>
+              <div style="font-size: 11px; color: var(--text-muted);" id="active-cart-subtitle">Bawa Pulang / Takeaway</div>
+            </div>
+            <div class="table-bind-badge" id="table-bind-btn" onclick="openTableSelectorModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+              <span id="active-table-label">Pilih Meja</span>
+            </div>
+          </div>
+
+          <div class="cart-list" id="cart-list">
+            <!-- Rendered via JS -->
+          </div>
+
+          <div class="cart-billing-footer">
+            <div class="bill-row">
+              <span>Subtotal Item</span>
+              <span class="val" id="bill-subtotal">Rp 0</span>
+            </div>
+            <div class="bill-row">
+              <span>Pajak Resto (PB1 10%)</span>
+              <span class="val" id="bill-tax">Rp 0</span>
+            </div>
+            <div class="bill-row grand-total">
+              <span>Total Tagihan</span>
+              <span class="val" id="bill-total">Rp 0</span>
+            </div>
+
+            <!-- Payment Type -->
+            <div class="payment-type-selector">
+              <button class="pay-type-btn active" id="pay-type-cash" onclick="setPaymentType('CASH')">Tunai (Cash)</button>
+              <button class="pay-type-btn" id="pay-type-digital" onclick="setPaymentType('DIGITAL')">QRIS / Non-Tunai</button>
+            </div>
+
+            <div class="checkout-action-row">
+              <button class="btn btn-outline" onclick="holdOrderToTable()" title="Tahan bill ke meja dine-in">
+                Tahan Meja
+              </button>
+              <button class="btn btn-emerald" id="btn-complete-order" onclick="completeCheckout()">
+                Bayar & Cetak
+              </button>
+            </div>
+
+            <!-- Split Bill Button -->
+            <button class="btn btn-outline" style="font-size: 12px; padding: 6px;" onclick="openSplitBillModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="16" x2="16" y1="3" y2="21"/><line x1="8" x2="8" y1="3" y2="21"/></svg>
+              Pisah Tagihan (Split Bill)
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- TAB 2: TABLE MAP (DINE-IN 12 MEJA) -->
+    <!-- ================================================================== -->
+    <div class="tab-content-area" id="tab-tables">
+      <div class="table-map-header">
+        <div>
+          <h2 style="font-size: 20px; font-weight: 700;">Denah Meja Restoran (Dine-In)</h2>
+          <p style="font-size: 13px; color: var(--text-muted);">Klik meja untuk membuka pesanan aktif atau memindahkan tamu.</p>
+        </div>
+
+        <div class="table-legend">
+          <div class="legend-item"><span class="legend-dot empty"></span> Kosong (Tersedia)</div>
+          <div class="legend-item"><span class="legend-dot dining"></span> Aktif Makan</div>
+          <div class="legend-item"><span class="legend-dot waiting"></span> Menunggu Bayar</div>
+        </div>
+      </div>
+
+      <div class="tables-grid" id="tables-grid">
+        <!-- 12 Tables rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- TAB 3: SHIFT SUMMARY & CASH RECONCILIATION -->
+    <!-- ================================================================== -->
+    <div class="tab-content-area" id="tab-shift">
+      <div class="shift-dashboard">
+        <div>
+          <h2 style="font-size: 20px; font-weight: 700;">Rekonsiliasi Shift & Audit Laci Kasir</h2>
+          <p style="font-size: 13px; color: var(--text-muted);">Pemeriksaan saldo fisik kas vs sistem untuk mencegah fraud karyawan.</p>
+        </div>
+
+        <div class="shift-summary-grid">
+          <div class="shift-kpi-card">
+            <div class="label">Modal Awal Laci (Float)</div>
+            <div class="val" id="shift-initial-cash">Rp 300.000</div>
+          </div>
+          <div class="shift-kpi-card">
+            <div class="label">Total Penjualan Tunai</div>
+            <div class="val" style="color: var(--emerald);" id="shift-total-cash">Rp 0</div>
+          </div>
+          <div class="shift-kpi-card">
+            <div class="label">Total Penjualan Digital / QRIS</div>
+            <div class="val" style="color: var(--indigo);" id="shift-total-digital">Rp 0</div>
+          </div>
+        </div>
+
+        <div class="reconciliation-panel">
+          <h3 style="font-size: 16px; font-weight: 700;">Audit Penutupan Shift (Closing Audit)</h3>
+
+          <div class="reconciliation-row">
+            <div>
+              <strong>Uang Fisik Kasir yang Diharapkan (Expected Cash)</strong>
+              <div style="font-size: 12px; color: var(--text-muted);">Modal Awal + Seluruh Penjualan Tunai</div>
+            </div>
+            <div class="val" style="font-family: var(--font-mono); font-size: 18px; font-weight: 700;" id="audit-expected-cash">Rp 300.000</div>
+          </div>
+
+          <div class="reconciliation-row">
+            <div>
+              <strong>Hitungan Uang Fisik Aktual di Laci (Actual Cash Count)</strong>
+              <div style="font-size: 12px; color: var(--text-muted);">Masukkan jumlah uang tunai yang dihitung kasir saat tutup shift</div>
+            </div>
+            <div style="width: 220px;">
+              <input type="number" id="actual-cash-input" class="input-field" placeholder="Masukkan hitungan fisik..." oninput="calculateShiftVariance()">
+            </div>
+          </div>
+
+          <!-- Audit Variance Box -->
+          <div class="audit-diff-box balanced" id="audit-variance-box">
+            <div>
+              <span id="audit-variance-label">Status Kas: Seimbang (Sesuai Sistem)</span>
+              <div style="font-size: 12px; opacity: 0.8;" id="audit-variance-desc">Tidak ada selisih kas terdeteksi.</div>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 18px; font-weight: 700;" id="audit-variance-val">Rp 0</div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px;">
+            <button class="btn btn-outline" onclick="printShiftReport()">Cetak Slip Rekonsiliasi</button>
+            <button class="btn btn-emerald" onclick="submitCloseShift()">Tutup Shift & Reset Laci</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modals -->
+
+  <!-- Variant Selection Modal -->
+  <div class="modal-backdrop" id="variant-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="variant-product-title">Pilih Varian & Modifier</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeVariantModal()">Batal</button>
+      </div>
+      <div class="modal-body" id="variant-modal-body">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <div style="flex:1; font-family: var(--font-mono); font-weight: 700; font-size: 16px;" id="variant-total-preview">Rp 0</div>
+        <button class="btn btn-primary" onclick="confirmAddVariantProduct()">Tambahkan ke Pesanan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Selector Modal -->
+  <div class="modal-backdrop" id="table-selector-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Pilih Meja untuk Pesanan</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeTableSelectorModal()">Tutup</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;" id="quick-tables-list">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="bindTableToCart(null)">Takeaway (Tanpa Meja)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supervisor Security PIN Modal -->
+  <div class="modal-backdrop" id="pin-modal">
+    <div class="modal-box" style="max-width: 360px;">
+      <div class="modal-header">
+        <h3>PIN Supervisor/Owner</h3>
+        <button class="btn btn-outline btn-sm" onclick="closePinModal()">Batal</button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Masukkan PIN 4-digit untuk beralih ke Mode Owner (Default: 8888):</p>
+        <input type="password" id="supervisor-pin-input" class="input-field" maxlength="4" style="text-align: center; font-size: 24px; letter-spacing: 8px;" placeholder="****">
+        <div id="pin-error-msg" style="color: var(--rose); font-size: 12px; margin-top: 8px; display: none;">PIN Salah! Akses ditolak.</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" style="width: 100%;" onclick="verifySupervisorPin()">Verifikasi PIN</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Split Bill Modal -->
+  <div class="modal-backdrop" id="split-bill-modal">
+    <div class="modal-box" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3>Pisah Tagihan (Split Bill)</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeSplitBillModal()">Tutup</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted);">Pilih opsi pemisahan tagihan untuk meja ini:</p>
+        <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+          <button class="btn btn-primary btn-sm" id="btn-split-equal" onclick="calculateSplitEqual()">Bagi Rata (Equal Split)</button>
+        </div>
+        <div id="split-result-box" style="background: var(--bg-dark); padding: 14px; border-radius: var(--radius-md); font-size: 13px;">
+          <!-- Dynamically generated split preview -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-emerald" onclick="confirmSplitBill()">Proses Split Payment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Multi-Slip Thermal Print Container -->
+  <div id="thermal-print-area">
+    <!-- Slip 1: Customer Receipt -->
+    <div id="slip-customer" class="thermal-slip-80"></div>
+    <!-- Slip 2: Kitchen Preparation Ticket (Without Prices) -->
+    <div id="slip-kitchen" class="thermal-slip-80"></div>
+    <!-- Shift Report Slip -->
+    <div id="slip-shift" class="thermal-slip-80"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/license-core.js"></script>
+
+  <script>
+    /**
+     * TIER 2: BUSINESS STUDIO POS LOGIC
+     */
+    const PIN_DEFAULT = '8888';
+    let isOwnerMode = false;
+    let activeTab = 'catalog';
+    let activePaymentType = 'CASH';
+    let boundTableId = null; // null = takeaway
+    let currentPendingProduct = null;
+
+    // Shift Tracking State
+    let shiftState = {
+      initialFloat: 300000,
+      cashSales: 0,
+      digitalSales: 0,
+      transactions: []
+    };
+
+    // 12 Tables State
+    let tables = Array.from({ length: 12 }, (_, i) => ({
+      id: `T${String(i + 1).padStart(2, '0')}`,
+      name: `Meja ${String(i + 1).padStart(2, '0')}`,
+      status: 'empty', // 'empty' | 'dining' | 'waiting'
+      cart: [],
+      guestCount: 2,
+      startTime: null
+    }));
+
+    // Catalog Products with nested variants & modifiers
+    const CATALOG_PRODUCTS = [
+      {
+        id: 'PRD-01',
+        sku: 'ESP-01',
+        name: 'Signature Latte',
+        category: 'Kopi',
+        basePrice: 24000,
+        variants: [
+          { name: 'Ukuran', options: [{ label: 'Regular', add: 0 }, { label: 'Large (Upsize)', add: 6000 }] },
+          { name: 'Tingkat Gula', options: [{ label: 'Normal 100%', add: 0 }, { label: 'Less Sugar 50%', add: 0 }, { label: 'Tanpa Gula', add: 0 }] },
+          { name: 'Extra Shot Espresso', options: [{ label: 'Tidak', add: 0 }, { label: '+1 Shot', add: 7000 }] }
+        ]
+      },
+      {
+        id: 'PRD-02',
+        sku: 'ESP-02',
+        name: 'Caramel Macchiato',
+        category: 'Kopi',
+        basePrice: 28000,
+        variants: [
+          { name: 'Ukuran', options: [{ label: 'Regular', add: 0 }, { label: 'Large', add: 6000 }] },
+          { name: 'Susu', options: [{ label: 'Fresh Milk', add: 0 }, { label: 'Oatmilk (+V)', add: 8000 }] }
+        ]
+      },
+      {
+        id: 'PRD-03',
+        sku: 'KIT-01',
+        name: 'Wagyu Beef Burger',
+        category: 'Makanan',
+        basePrice: 55000,
+        variants: [
+          { name: 'Tingkat Kematangan', options: [{ label: 'Medium Well', add: 0 }, { label: 'Well Done', add: 0 }] },
+          { name: 'Extra Keju Cheddar', options: [{ label: 'Tidak', add: 0 }, { label: '+ Double Cheese', add: 8000 }] }
+        ]
+      },
+      {
+        id: 'PRD-04',
+        sku: 'KIT-02',
+        name: 'Truffle Fries Supreme',
+        category: 'Snack',
+        basePrice: 32000,
+        variants: [
+          { name: 'Saus Dip', options: [{ label: 'Truffle Mayo', add: 0 }, { label: 'Spicy Tartar', add: 0 }, { label: 'Cheese Sauce', add: 3000 }] }
+        ]
+      },
+      {
+        id: 'PRD-05',
+        sku: 'BEV-01',
+        name: 'Artisan Peach Iced Tea',
+        category: 'Minuman',
+        basePrice: 22000,
+        variants: [
+          { name: 'Topping', options: [{ label: 'Standard', add: 0 }, { label: '+ Chia Seed', add: 4000 }, { label: '+ Peach Jelly', add: 5000 }] }
+        ]
+      }
+    ];
+
+    let currentCart = [];
+    let activeCategory = 'ALL';
+    let searchQuery = '';
+
+    // Initialize App
+    function initApp() {
+      loadStorageData();
+      renderCategoryPills();
+      renderProducts();
+      renderCart();
+      renderTablesGrid();
+      updateShiftDashboard();
+    }
+
+    function formatIdr(num) {
+      return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+    }
+
+    // Storage Persistence
+    function loadStorageData() {
+      try {
+        const storedShift = localStorage.getItem('KASIR_T2_SHIFT');
+        if (storedShift) shiftState = JSON.parse(storedShift);
+        const storedTables = localStorage.getItem('KASIR_T2_TABLES');
+        if (storedTables) tables = JSON.parse(storedTables);
+      } catch (e) {}
+    }
+
+    function saveStorageData() {
+      localStorage.setItem('KASIR_T2_SHIFT', JSON.stringify(shiftState));
+      localStorage.setItem('KASIR_T2_TABLES', JSON.stringify(tables));
+    }
+
+    // Tab Navigation
+    function switchTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content-area').forEach(tab => tab.classList.remove('active'));
+
+      document.getElementById(`tab-btn-${tabId}`).classList.add('active');
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+
+      if (tabId === 'tables') renderTablesGrid();
+      if (tabId === 'shift') updateShiftDashboard();
+    }
+
+    // Dual-Role Security Toggle
+    function toggleRoleAuth() {
+      if (isOwnerMode) {
+        // Switch back to Cashier Mode directly
+        isOwnerMode = false;
+        applyRoleMode();
+      } else {
+        // Open PIN prompt
+        document.getElementById('supervisor-pin-input').value = '';
+        document.getElementById('pin-error-msg').style.display = 'none';
+        document.getElementById('pin-modal').classList.add('active');
+      }
+    }
+
+    function closePinModal() {
+      document.getElementById('pin-modal').classList.remove('active');
+    }
+
+    function verifySupervisorPin() {
+      const pin = document.getElementById('supervisor-pin-input').value;
+      if (pin === PIN_DEFAULT) {
+        isOwnerMode = true;
+        closePinModal();
+        applyRoleMode();
+      } else {
+        document.getElementById('pin-error-msg').style.display = 'block';
+      }
+    }
+
+    function applyRoleMode() {
+      const badge = document.getElementById('role-toggle-badge');
+      const label = document.getElementById('role-label');
+      if (isOwnerMode) {
+        badge.className = 'role-badge owner';
+        label.textContent = 'OWNER / SUPERVISOR';
+      } else {
+        badge.className = 'role-badge cashier';
+        label.textContent = 'KASIR MODE';
+      }
+    }
+
+    // Product Category & Search
+    function renderCategoryPills() {
+      const cats = ['ALL', ...new Set(CATALOG_PRODUCTS.map(p => p.category))];
+      const container = document.getElementById('category-pills');
+      container.innerHTML = cats.map(c => `
+        <button class="cat-btn ${c === activeCategory ? 'active' : ''}" onclick="filterCategory('${c}')">
+          ${c === 'ALL' ? 'Semua Menu' : c}
+        </button>
+      `).join('');
+    }
+
+    function filterCategory(cat) {
+      activeCategory = cat;
+      renderCategoryPills();
+      renderProducts();
+    }
+
+    function handleSearch(q) {
+      searchQuery = q.toLowerCase();
+      renderProducts();
+    }
+
+    // Render Products Grid
+    function renderProducts() {
+      const container = document.getElementById('products-grid');
+      const filtered = CATALOG_PRODUCTS.filter(p => {
+        const matchCat = activeCategory === 'ALL' || p.category === activeCategory;
+        const matchSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery) || p.sku.toLowerCase().includes(searchQuery);
+        return matchCat && matchSearch;
+      });
+
+      container.innerHTML = filtered.map(p => `
+        <div class="product-card">
+          <span class="variant-indicator">${p.variants.length} Varian</span>
+          <div class="prod-sku">${p.sku}</div>
+          <h4 class="prod-name">${p.name}</h4>
+          <div class="prod-price">${formatIdr(p.basePrice)}</div>
+          <button class="btn btn-primary" onclick="openVariantModal('${p.id}')">
+            Pilih Varian
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // Variant Selection Modal
+    function openVariantModal(productId) {
+      const prod = CATALOG_PRODUCTS.find(p => p.id === productId);
+      if (!prod) return;
+
+      currentPendingProduct = {
+        id: prod.id,
+        name: prod.name,
+        basePrice: prod.basePrice,
+        selectedOptions: {}
+      };
+
+      document.getElementById('variant-product-title').textContent = prod.name;
+      const modalBody = document.getElementById('variant-modal-body');
+
+      modalBody.innerHTML = prod.variants.map((v, vIdx) => {
+        // default select first option
+        currentPendingProduct.selectedOptions[v.name] = v.options[0];
+
+        return `
+          <div style="margin-bottom: 12px;">
+            <div style="font-size: 13px; font-weight: 600; color: #FFFFFF; margin-bottom: 6px;">${v.name}</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px;">
+              ${v.options.map((opt, oIdx) => `
+                <button type="button" class="btn btn-outline btn-sm variant-opt-btn" id="opt-${vIdx}-${oIdx}" style="${oIdx === 0 ? 'background: var(--indigo); border-color: var(--indigo); color: #fff;' : ''}" onclick="selectVariantOption('${v.name}', ${vIdx}, ${oIdx}, ${JSON.stringify(opt).replace(/"/g, '&quot;')})">
+                  ${opt.label} ${opt.add > 0 ? `(+${formatIdr(opt.add)})` : ''}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      updateVariantPreview();
+      document.getElementById('variant-modal').classList.add('active');
+    }
+
+    function selectVariantOption(varName, vIdx, oIdx, option) {
+      currentPendingProduct.selectedOptions[varName] = option;
+      // Update button styling for this variant group
+      const buttons = document.querySelectorAll(`[id^="opt-${vIdx}-"]`);
+      buttons.forEach(b => {
+        b.style.background = 'transparent';
+        b.style.borderColor = 'var(--border-color)';
+        b.style.color = 'var(--text-main)';
+      });
+      const activeBtn = document.getElementById(`opt-${vIdx}-${oIdx}`);
+      if (activeBtn) {
+        activeBtn.style.background = 'var(--indigo)';
+        activeBtn.style.borderColor = 'var(--indigo)';
+        activeBtn.style.color = '#FFFFFF';
+      }
+      updateVariantPreview();
+    }
+
+    function updateVariantPreview() {
+      let total = currentPendingProduct.basePrice;
+      Object.values(currentPendingProduct.selectedOptions).forEach(opt => {
+        total += (opt.add || 0);
+      });
+      document.getElementById('variant-total-preview').textContent = formatIdr(total);
+    }
+
+    function closeVariantModal() {
+      document.getElementById('variant-modal').classList.remove('active');
+      currentPendingProduct = null;
+    }
+
+    function confirmAddVariantProduct() {
+      if (!currentPendingProduct) return;
+      let finalPrice = currentPendingProduct.basePrice;
+      const modifierLabels = [];
+
+      Object.entries(currentPendingProduct.selectedOptions).forEach(([name, opt]) => {
+        finalPrice += (opt.add || 0);
+        modifierLabels.push(`${name}: ${opt.label}`);
+      });
+
+      const cartItem = {
+        cartItemId: 'CI-' + Date.now() + Math.random().toString(36).substr(2, 4),
+        id: currentPendingProduct.id,
+        name: currentPendingProduct.name,
+        price: finalPrice,
+        modifiers: modifierLabels.join(' | '),
+        qty: 1
+      };
+
+      currentCart.push(cartItem);
+      closeVariantModal();
+      renderCart();
+    }
+
+    // Cart Operations
+    function renderCart() {
+      const container = document.getElementById('cart-list');
+      const tableLabel = document.getElementById('active-table-label');
+      const subtitle = document.getElementById('active-cart-subtitle');
+
+      if (boundTableId) {
+        tableLabel.textContent = boundTableId;
+        subtitle.textContent = `Dine-in Pesanan di ${boundTableId}`;
+      } else {
+        tableLabel.textContent = 'Pilih Meja';
+        subtitle.textContent = 'Bawa Pulang / Takeaway';
+      }
+
+      if (currentCart.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; color: var(--text-subtle); padding: 48px 0; font-size: 13px;">
+            Belum ada item pesanan.<br>Pilih menu di katalog.
+          </div>
+        `;
+        updateBilling();
+        return;
+      }
+
+      container.innerHTML = currentCart.map(item => `
+        <div class="cart-item">
+          <div>
+            <div class="cart-item-title">${item.name}</div>
+            <div class="cart-item-modifiers">${item.modifiers}</div>
+            <div class="cart-item-price">${formatIdr(item.price)}</div>
+          </div>
+          <div class="cart-qty-ctrl">
+            <button class="qty-step-btn" onclick="updateCartItemQty('${item.cartItemId}', -1)">-</button>
+            <span class="qty-num">${item.qty}</span>
+            <button class="qty-step-btn" onclick="updateCartItemQty('${item.cartItemId}', 1)">+</button>
+          </div>
+          <div class="cart-subtotal">${formatIdr(item.price * item.qty)}</div>
+        </div>
+      `).join('');
+
+      updateBilling();
+    }
+
+    function updateCartItemQty(cartItemId, delta) {
+      const idx = currentCart.findIndex(i => i.cartItemId === cartItemId);
+      if (idx === -1) return;
+      currentCart[idx].qty += delta;
+      if (currentCart[idx].qty <= 0) {
+        currentCart.splice(idx, 1);
+      }
+      renderCart();
+    }
+
+    function updateBilling() {
+      const subtotal = currentCart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+      const tax = Math.round(subtotal * 0.10); // PB1 10%
+      const grandTotal = subtotal + tax;
+
+      document.getElementById('bill-subtotal').textContent = formatIdr(subtotal);
+      document.getElementById('bill-tax').textContent = formatIdr(tax);
+      document.getElementById('bill-total').textContent = formatIdr(grandTotal);
+
+      return { subtotal, tax, grandTotal };
+    }
+
+    function setPaymentType(type) {
+      activePaymentType = type;
+      document.getElementById('pay-type-cash').classList.toggle('active', type === 'CASH');
+      document.getElementById('pay-type-digital').classList.toggle('active', type === 'DIGITAL');
+    }
+
+    // Table Management (12 Tables)
+    function renderTablesGrid() {
+      const grid = document.getElementById('tables-grid');
+      grid.innerHTML = tables.map(t => {
+        const itemCount = t.cart.reduce((a, b) => a + b.qty, 0);
+        const totalAmount = t.cart.reduce((a, b) => a + (b.price * b.qty), 0) * 1.1;
+
+        let statusText = 'Kosong';
+        if (t.status === 'dining') statusText = 'Makan';
+        if (t.status === 'waiting') statusText = 'Menunggu';
+
+        return `
+          <div class="table-card ${t.status}" onclick="handleTableClick('${t.id}')">
+            <div class="table-card-top">
+              <span class="table-number">${t.name}</span>
+              <span class="table-status-pill">${statusText}</span>
+            </div>
+            <div class="table-details">
+              <div>Kapasitas: ${t.guestCount} Tamu</div>
+              <div>Pesanan: ${itemCount} Item</div>
+              <div class="table-amount">${itemCount > 0 ? formatIdr(totalAmount) : 'Rp 0'}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleTableClick(tableId) {
+      const table = tables.find(t => t.id === tableId);
+      if (!table) return;
+
+      if (table.cart.length > 0) {
+        // Load table's cart to active session
+        boundTableId = table.id;
+        currentCart = [...table.cart];
+        switchTab('catalog');
+        renderCart();
+      } else {
+        // Bind current cart to this empty table
+        boundTableId = table.id;
+        switchTab('catalog');
+        renderCart();
+      }
+    }
+
+    function holdOrderToTable() {
+      if (!boundTableId) {
+        openTableSelectorModal();
+        return;
+      }
+      const table = tables.find(t => t.id === boundTableId);
+      if (!table) return;
+
+      table.cart = [...currentCart];
+      table.status = 'dining';
+      table.startTime = new Date().toISOString();
+      saveStorageData();
+      alert(`Pesanan berhasil ditahan ke ${table.name}`);
+      currentCart = [];
+      boundTableId = null;
+      renderCart();
+    }
+
+    // Quick Table Selector Modal
+    function openTableSelectorModal() {
+      const list = document.getElementById('quick-tables-list');
+      list.innerHTML = tables.map(t => `
+        <button class="btn btn-outline btn-sm" onclick="bindTableToCart('${t.id}')" style="justify-content: space-between;">
+          <span>${t.name}</span>
+          <span style="font-size: 10px; color: ${t.status === 'empty' ? 'var(--emerald)' : 'var(--amber)'};">${t.status}</span>
+        </button>
+      `).join('');
+      document.getElementById('table-selector-modal').classList.add('active');
+    }
+
+    function closeTableSelectorModal() {
+      document.getElementById('table-selector-modal').classList.remove('active');
+    }
+
+    function bindTableToCart(tableId) {
+      boundTableId = tableId;
+      closeTableSelectorModal();
+      renderCart();
+    }
+
+    // Split Bill Feature
+    function openSplitBillModal() {
+      if (currentCart.length === 0) {
+        alert('Keranjang kosong, tidak ada tagihan untuk dipisah');
+        return;
+      }
+      calculateSplitEqual(2);
+      document.getElementById('split-bill-modal').classList.add('active');
+    }
+
+    function closeSplitBillModal() {
+      document.getElementById('split-bill-modal').classList.remove('active');
+    }
+
+    function calculateSplitEqual(parts = 2) {
+      const { grandTotal } = updateBilling();
+      const perPart = Math.ceil(grandTotal / parts);
+      const container = document.getElementById('split-result-box');
+
+      container.innerHTML = `
+        <div style="font-weight: 700; margin-bottom: 8px;">Simulasi Pembagian ${parts} Orang (Equal Split):</div>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          ${[2, 3, 4].map(p => `
+            <button class="btn btn-outline btn-sm" onclick="calculateSplitEqual(${p})">${p} Orang</button>
+          `).join('')}
+        </div>
+        ${Array.from({ length: parts }, (_, i) => `
+          <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border-color);">
+            <span>Sub-Bill #${i + 1}</span>
+            <span style="font-family: var(--font-mono); font-weight: 700; color: var(--indigo);">${formatIdr(perPart)}</span>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    function confirmSplitBill() {
+      alert('Split Bill berhasil diproses menjadi sub-transaksi terpisah.');
+      closeSplitBillModal();
+      completeCheckout();
+    }
+
+    // Checkout & Dual Thermal Slip Printing (Customer + Kitchen)
+    function completeCheckout() {
+      if (currentCart.length === 0) return;
+      const { subtotal, tax, grandTotal } = updateBilling();
+      const paperWidth = document.getElementById('thermal-width-select').value;
+      const nowStr = new Date().toLocaleString('id-ID');
+      const orderId = 'ORD-' + Date.now().toString(36).toUpperCase();
+
+      // Record to Shift
+      if (activePaymentType === 'CASH') {
+        shiftState.cashSales += grandTotal;
+      } else {
+        shiftState.digitalSales += grandTotal;
+      }
+
+      shiftState.transactions.unshift({
+        id: orderId,
+        time: nowStr,
+        table: boundTableId || 'Takeaway',
+        total: grandTotal,
+        paymentType: activePaymentType
+      });
+
+      // Clear Table if dining
+      if (boundTableId) {
+        const table = tables.find(t => t.id === boundTableId);
+        if (table) {
+          table.status = 'empty';
+          table.cart = [];
+        }
+      }
+
+      saveStorageData();
+
+      // Generate Slip 1: Customer Receipt
+      const slipCustomer = document.getElementById('slip-customer');
+      slipCustomer.className = paperWidth === '58mm' ? 'thermal-slip-58' : 'thermal-slip-80';
+      slipCustomer.innerHTML = `
+        <div class="slip-title">BUSINESS STUDIO CAFE</div>
+        <div class="slip-center">Kawasan Bisnis Sudirman Kav. 52, Jakarta</div>
+        <div class="slip-center">NPWP: 01.889.920.1-012.000</div>
+        <div class="slip-divider"></div>
+        <div style="display:flex; justify-content:space-between;">
+          <span>Order: ${orderId}</span>
+          <span>${boundTableId || 'Takeaway'}</span>
+        </div>
+        <div>Waktu: ${nowStr}</div>
+        <div class="slip-divider"></div>
+        <table class="slip-table">
+          <tbody>
+            ${currentCart.map(i => `
+              <tr>
+                <td colspan="2" style="font-weight:700;">${i.name}</td>
+              </tr>
+              <tr>
+                <td style="font-size:9px; color:#555;">${i.modifiers}</td>
+                <td style="text-align:right;">${formatIdr(i.price * i.qty)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <div class="slip-divider"></div>
+        <table class="slip-table">
+          <tr><td>Subtotal</td><td style="text-align:right;">${formatIdr(subtotal)}</td></tr>
+          <tr><td>PB1 (10%)</td><td style="text-align:right;">${formatIdr(tax)}</td></tr>
+          <tr style="font-weight:700;"><td>TOTAL</td><td style="text-align:right;">${formatIdr(grandTotal)}</td></tr>
+          <tr><td>Metode Bayar</td><td style="text-align:right;">${activePaymentType}</td></tr>
+        </table>
+        <div class="slip-divider"></div>
+        <div class="slip-center" style="font-size:10px;">Terima Kasih Atas Kunjungan Anda!</div>
+      `;
+
+      // Generate Slip 2: Kitchen Preparation Ticket (Strictly NO PRICES)
+      const slipKitchen = document.getElementById('slip-kitchen');
+      slipKitchen.className = paperWidth === '58mm' ? 'thermal-slip-58' : 'thermal-slip-80';
+      slipKitchen.innerHTML = `
+        <div class="slip-title">*** TIKET DAPUR / KITCHEN ***</div>
+        <div class="slip-center" style="font-size:14px; font-weight:700;">MEJA: ${boundTableId || 'TAKEAWAY'}</div>
+        <div style="display:flex; justify-content:space-between; margin: 4px 0;">
+          <span>Order: ${orderId}</span>
+          <span>${nowStr.split(' ')[1] || nowStr}</span>
+        </div>
+        <div class="slip-divider"></div>
+        <table class="slip-table">
+          <tbody>
+            ${currentCart.map(i => `
+              <tr>
+                <td style="font-size:13px; font-weight:700;">[ ${i.qty}x ] ${i.name}</td>
+              </tr>
+              <tr>
+                <td style="font-size:11px; padding-left:12px; font-style:italic;">&gt;&gt; ${i.modifiers}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <div class="slip-divider"></div>
+        <div class="slip-center" style="font-weight:700;">SIAPKAN SEGERA SESUAI TIKET</div>
+      `;
+
+      // Print
+      setTimeout(() => {
+        window.print();
+      }, 100);
+
+      currentCart = [];
+      boundTableId = null;
+      renderCart();
+      updateShiftDashboard();
+    }
+
+    // Shift Dashboard & Fraud Audit
+    function updateShiftDashboard() {
+      document.getElementById('shift-initial-cash').textContent = formatIdr(shiftState.initialFloat);
+      document.getElementById('shift-total-cash').textContent = formatIdr(shiftState.cashSales);
+      document.getElementById('shift-total-digital').textContent = formatIdr(shiftState.digitalSales);
+
+      const expectedCash = shiftState.initialFloat + shiftState.cashSales;
+      document.getElementById('audit-expected-cash').textContent = formatIdr(expectedCash);
+
+      calculateShiftVariance();
+    }
+
+    function calculateShiftVariance() {
+      const expectedCash = shiftState.initialFloat + shiftState.cashSales;
+      const actualInput = parseFloat(document.getElementById('actual-cash-input').value) || 0;
+      const variance = actualInput - expectedCash;
+
+      const box = document.getElementById('audit-variance-box');
+      const label = document.getElementById('audit-variance-label');
+      const desc = document.getElementById('audit-variance-desc');
+      const val = document.getElementById('audit-variance-val');
+
+      val.textContent = formatIdr(variance);
+
+      if (variance === 0) {
+        box.className = 'audit-diff-box balanced';
+        label.textContent = 'Status Kas: Seimbang (Sesuai Sistem)';
+        desc.textContent = 'Hitungan fisik cocok 100% dengan total transaksi kasir.';
+      } else if (variance < 0) {
+        box.className = 'audit-diff-box shortage';
+        label.textContent = 'PERINGATAN: Selisih Minus (Potensi Fraud / Uang Kurang)';
+        desc.textContent = `Uang fisik di laci kurang ${formatIdr(Math.abs(variance))} dari yang seharusnya.`;
+      } else {
+        box.className = 'audit-diff-box balanced';
+        label.textContent = 'Status Kas: Lebih (Surplus)';
+        desc.textContent = `Uang fisik melebihi pencatatan sistem sebesar ${formatIdr(variance)}.`;
+      }
+    }
+
+    function printShiftReport() {
+      const expectedCash = shiftState.initialFloat + shiftState.cashSales;
+      const actualInput = parseFloat(document.getElementById('actual-cash-input').value) || 0;
+      const variance = actualInput - expectedCash;
+
+      const slipShift = document.getElementById('slip-shift');
+      slipShift.innerHTML = `
+        <div class="slip-title">LAPORAN PENUTUPAN SHIFT</div>
+        <div class="slip-center">BUSINESS STUDIO POS</div>
+        <div class="slip-divider"></div>
+        <div>Waktu Cetak: ${new Date().toLocaleString('id-ID')}</div>
+        <div class="slip-divider"></div>
+        <table class="slip-table">
+          <tr><td>Modal Awal (Float)</td><td style="text-align:right;">${formatIdr(shiftState.initialFloat)}</td></tr>
+          <tr><td>Total Penjualan Tunai</td><td style="text-align:right;">${formatIdr(shiftState.cashSales)}</td></tr>
+          <tr><td>Total Penjualan Digital</td><td style="text-align:right;">${formatIdr(shiftState.digitalSales)}</td></tr>
+          <tr style="font-weight:700;"><td>Ekspektasi Uang Kas</td><td style="text-align:right;">${formatIdr(expectedCash)}</td></tr>
+          <tr><td>Hitungan Fisik Aktual</td><td style="text-align:right;">${formatIdr(actualInput)}</td></tr>
+          <tr style="font-weight:700;"><td>Selisih Kas (Variance)</td><td style="text-align:right;">${formatIdr(variance)}</td></tr>
+        </table>
+        <div class="slip-divider"></div>
+        <div class="slip-center">Tanda Tangan Kasir &amp; Supervisor</div>
+      `;
+
+      // Hide others temporarily
+      document.getElementById('slip-customer').innerHTML = '';
+      document.getElementById('slip-kitchen').innerHTML = '';
+      setTimeout(() => window.print(), 100);
+    }
+
+    function submitCloseShift() {
+      if (confirm('Konfirmasi penutupan shift dan reset laci kasir?')) {
+        shiftState.cashSales = 0;
+        shiftState.digitalSales = 0;
+        shiftState.transactions = [];
+        saveStorageData();
+        document.getElementById('actual-cash-input').value = '';
+        updateShiftDashboard();
+        alert('Shift berhasil ditutup. Laci direset untuk shift berikutnya.');
+      }
+    }
+
+    // Backup Engine: JSON export & Encrypted Backup Simulation
+    async function triggerBackupEngine() {
+      const backupData = {
+        timestamp: new Date().toISOString(),
+        shiftState,
+        tables,
+        catalog: CATALOG_PRODUCTS
+      };
+
+      const jsonStr = JSON.stringify(backupData, null, 2);
+      
+      // Export JSON File
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Backup_BusinessStudio_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      // Encrypted simulation using Web Crypto AES-GCM
+      if (window.KasirSecurity) {
+        const encrypted = await window.KasirSecurity.AntiTamper.encrypt(backupData);
+        localStorage.setItem('KASIR_SECURE_BACKUP_BLOB', JSON.stringify(encrypted));
+        alert('Backup Berhasil! File JSON diunduh dan snapshot terenkripsi AES-GCM 256-bit disimpan di penyimpanan lokal aman.');
+      } else {
+        alert('Backup JSON berhasil diunduh.');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>

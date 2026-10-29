@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kasir Architecture POS Suite — Solusi Kasir Offline-First &amp; Cloud Mesh Bergaransi</title>
+  <meta name="description" content="Aplikasi POS kasir komersial offline-first terlengkap dari UMKM hingga franchise enterprise multi-cabang. Sekali bayar, tanpa biaya langganan, anti-tamper hardware lock.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070A12;
+      --bg-surface: #0E1424;
+      --bg-card: #151D33;
+      --bg-card-hover: #1C2745;
+      
+      --border-subtle: rgba(148, 163, 184, 0.12);
+      --border-active: rgba(99, 102, 241, 0.4);
+      --border-cyan: rgba(6, 182, 212, 0.4);
+
+      --primary: #6366F1;
+      --primary-hover: #4F46E5;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+
+      --cyan: #06B6D4;
+      --cyan-glow: rgba(6, 182, 212, 0.35);
+
+      --emerald: #10B981;
+      --emerald-glow: rgba(16, 185, 129, 0.3);
+
+      --amber: #F59E0B;
+      --rose: #F43F5E;
+
+      --text-main: #FFFFFF;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+
+      --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --shadow-card: 0 16px 36px -8px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 90% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+        linear-gradient(rgba(148, 163, 184, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+      color: var(--text-main);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Top Sticky Navigation */
+    .navbar {
+      height: 72px;
+      background: rgba(7, 10, 18, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .brand-logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .brand-name {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-badge {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(99, 102, 241, 0.15);
+      color: #A5B4FC;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+    .nav-link:hover {
+      color: #FFFFFF;
+    }
+
+    .nav-cta-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-ui);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: var(--border-subtle);
+      color: var(--text-main);
+    }
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-cyan {
+      background: var(--cyan);
+      color: #06121E;
+      font-weight: 700;
+      box-shadow: 0 4px 14px var(--cyan-glow);
+    }
+    .btn-cyan:hover {
+      background: #22D3EE;
+      transform: translateY(-1px);
+    }
+
+    .btn-emerald {
+      background: var(--emerald);
+      color: #031D12;
+      font-weight: 700;
+      box-shadow: 0 4px 14px var(--emerald-glow);
+    }
+    .btn-emerald:hover {
+      background: #34D399;
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section */
+    .hero-section {
+      padding: 70px 40px 60px;
+      max-width: 1320px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #C7D2FE;
+      margin-bottom: 24px;
+    }
+
+    .hero-headline {
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+      max-width: 980px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-headline span.gradient-text {
+      background: linear-gradient(135deg, #A5B4FC, #38BDF8, #34D399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subhead {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 760px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+
+    .hero-cta-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+
+    /* Trust Pillars Grid */
+    .trust-pillars {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .pillar-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .pillar-icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--cyan);
+      flex-shrink: 0;
+    }
+
+    .pillar-text h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 2px;
+    }
+    .pillar-text p {
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.3;
+    }
+
+    /* Product Tiers Showcase Section */
+    .section-container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 60px 40px;
+    }
+
+    .section-title-wrap {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .section-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cyan);
+      margin-bottom: 8px;
+    }
+
+    .section-heading {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .section-subheading {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* 3-Tier Commercial Pricing Grid */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .pricing-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 34px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+    .pricing-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.7);
+    }
+
+    .pricing-card.popular {
+      background: linear-gradient(180deg, #151D33 0%, #0E1424 100%);
+      border-color: rgba(99, 102, 241, 0.6);
+      box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.2);
+    }
+
+    .pricing-card.enterprise {
+      background: linear-gradient(180deg, #121B2F 0%, #090E1A 100%);
+      border-color: rgba(6, 182, 212, 0.5);
+      box-shadow: 0 20px 40px -10px rgba(6, 182, 212, 0.2);
+    }
+
+    .tier-ribbon {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.05em;
+    }
+    .ribbon-t1 { background: rgba(37, 99, 235, 0.15); color: #93C5FD; border: 1px solid rgba(37, 99, 235, 0.3); }
+    .ribbon-t2 { background: rgba(99, 102, 241, 0.2); color: #C7D2FE; border: 1px solid rgba(99, 102, 241, 0.4); }
+    .ribbon-t3 { background: rgba(6, 182, 212, 0.2); color: #A5F3FC; border: 1px solid rgba(6, 182, 212, 0.4); }
+
+    .card-top h3 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+    }
+
+    .card-ideal-for {
+      font-size: 12px;
+      color: var(--cyan);
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .price-block {
+      padding: 18px 0;
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 24px;
+    }
+
+    .price-num {
+      font-family: var(--font-mono);
+      font-size: 34px;
+      font-weight: 800;
+      color: #FFFFFF;
+      line-height: 1;
+    }
+
+    .price-term {
+      font-size: 12px;
+      color: var(--emerald);
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .whats-included-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .feature-list li {
+      font-size: 13px;
+      color: #E2E8F0;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.45;
+    }
+
+    .feature-list li svg {
+      color: var(--emerald);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Live Interactive Sandbox Drawer / Modal */
+    .sandbox-preview-strip {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      margin-top: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .sandbox-text h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .sandbox-text p {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 600px;
+    }
+
+    /* Comparison Table */
+    .comparison-section {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 80px 40px;
+    }
+
+    .comparison-table {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .comparison-table th {
+      padding: 16px 20px;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 2px solid var(--border-subtle);
+      color: #FFFFFF;
+    }
+
+    .comparison-table td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+    }
+
+    .comparison-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+      color: #FFFFFF;
+    }
+
+    .check-yes {
+      color: var(--emerald);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+    .check-no {
+      color: var(--text-dim);
+      font-size: 12px;
+    }
+
+    /* Anti-Tamper & Security Architecture */
+    .security-section {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 80px 40px;
+    }
+
+    .security-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .sec-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sec-icon-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+    }
+
+    .sec-card h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+    .sec-card p {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Modal Live Interactive Sandbox */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 14, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .demo-modal-window {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-cyan);
+      border-radius: var(--radius-lg);
+      width: 95%;
+      max-width: 1240px;
+      height: 88vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(6, 182, 212, 0.25);
+    }
+
+    .demo-modal-top {
+      padding: 14px 24px;
+      background: #0B0F1C;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .demo-sandbox-notice {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--amber);
+      background: rgba(245, 158, 11, 0.12);
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .demo-iframe-container {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #000;
+    }
+
+    /* WhatsApp Order Modal */
+    .order-modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 520px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .form-input {
+      padding: 12px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: #FFFFFF;
+      font-family: var(--font-ui);
+      font-size: 14px;
+      outline: none;
+    }
+    .form-input:focus {
+      border-color: var(--primary);
+    }
+
+    /* Footer */
+    .footer {
+      background: #060911;
+      border-top: 1px solid var(--border-subtle);
+      padding: 40px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sticky Navigation -->
+  <header class="navbar">
+    <a href="#" class="brand-group">
+      <div class="brand-logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+      </div>
+      <div class="brand-name">
+        KASIR POS SUITE
+        <span class="brand-badge">PRO v2026</span>
+      </div>
+    </a>
+
+    <nav class="nav-links">
+      <a href="#fitur" class="nav-link">Pilihan Paket</a>
+      <a href="#perbandingan" class="nav-link">Detail Fitur</a>
+      <a href="#keamanan" class="nav-link">Keamanan Anti-Bajak</a>
+      <a href="#faq" class="nav-link">FAQ</a>
+    </nav>
+
+    <div class="nav-cta-group">
+      <!-- Direct Hardware Lock Telemetry Badge -->
+      <div style="font-family: var(--font-mono); font-size: 11px; color: var(--cyan); background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.25); padding: 5px 12px; border-radius: 6px; cursor: pointer;" onclick="openResellerModal()" title="Klik untuk membuka Area Lisensi & Reseller">
+        <span id="nav-machine-id">DEVICE: DETECTING...</span>
+      </div>
+
+      <button class="btn btn-emerald" onclick="openOrderModal('T2')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Pesan via WhatsApp
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-pill">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Aplikasi Kasir Sekali Bayar &bull; Tanpa Langganan Bulanan &bull; 100% Offline-First
+    </div>
+
+    <h1 class="hero-headline">
+      Beli Aplikasi Kasir POS Terbaik,<br>
+      <span class="gradient-text">Coba Demo Langsung Sebelum Bayar.</span>
+    </h1>
+
+    <p class="hero-subhead">
+      Dapatkan sistem kasir komersial berlisensi resmi yang cepat, akurat, dan dapat bekerja tanpa koneksi internet. Dilindungi enkripsi anti-tamper hardware lock sehingga bisnis Anda aman, mandiri, dan bebas biaya sewa software selamanya.
+    </p>
+
+    <div class="hero-cta-row">
+      <button class="btn btn-primary" onclick="launchDemo('tier2')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        Coba Demo Live (Gratis di Browser)
+      </button>
+      <a href="#fitur" class="btn btn-outline">
+        Lihat Apa yang Anda Dapatkan
+      </a>
+    </div>
+
+    <!-- Trust Pillars -->
+    <div class="trust-pillars">
+      <div class="pillar-item">
+        <div class="pillar-icon-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" x2="23" y1="1" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" x2="12.01" y1="20" y2="20"/></svg>
+        </div>
+        <div class="pillar-text">
+          <h4>100% Offline-First</h4>
+          <p>Internet mati? Kasir tetap beroperasi normal tanpa kendala.</p>
+        </div>
+      </div>
+
+      <div class="pillar-item">
+        <div class="pillar-icon-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="pillar-text">
+          <h4>Anti-Bajak SHA-256</h4>
+          <p>Kunci lisensi terkunci spesifik ke hardware mesin Anda.</p>
+        </div>
+      </div>
+
+      <div class="pillar-item">
+        <div class="pillar-icon-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div class="pillar-text">
+          <h4>Beli Putus (No Monthly Fee)</h4>
+          <p>Tanpa potongan per transaksi &amp; tanpa tagihan bulanan.</p>
+        </div>
+      </div>
+
+      <div class="pillar-item">
+        <div class="pillar-icon-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+        </div>
+        <div class="pillar-text">
+          <h4>Support Thermal 58/80mm</h4>
+          <p>Langsung cetak ke printer struk USB, Bluetooth, &amp; LAN.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pilihan Paket & Apa Yang Anda Dapatkan -->
+  <section class="section-container" id="fitur">
+    <div class="section-title-wrap">
+      <div class="section-eyebrow">TRANSPARANSI HARGA &amp; FITUR</div>
+      <h2 class="section-heading">Harga Segini, Dapet Apa Aja?</h2>
+      <p class="section-subheading">
+        Setiap paket dirancang khusus sesuai skala usaha Anda. Klik <strong>"Coba Demo"</strong> pada paket mana pun untuk menguji sistemnya secara langsung di browser tanpa instalasi.
+      </p>
+    </div>
+
+    <div class="pricing-grid">
+      
+      <!-- TIER 1 -->
+      <div class="pricing-card">
+        <div class="card-top">
+          <span class="tier-ribbon ribbon-t1">TIER 1 &bull; STARTER</span>
+          <h3>Starter Core</h3>
+          <div class="card-ideal-for">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Cocok: Toko Kelontong, Laundry, Kios, Warkop
+          </div>
+
+          <div class="price-block">
+            <div class="price-num">Rp 100.000</div>
+            <div class="price-term">Lisensi Sekali Beli &bull; Tanpa Langganan</div>
+          </div>
+
+          <div class="whats-included-label">Yang Anda Dapatkan:</div>
+          <ul class="feature-list">
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>100% Offline-First</strong>: Data tersimpan aman di komputer/laptop lokal.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Manajemen Stok Cepat (+ / -)</strong>: Edit stok &amp; harga barang langsung di kartu.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Kasir Super Cepat</strong>: Tombol uang pas (20k, 50k, 100k) &amp; hitung kembalian otomatis.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Cetak Struk Thermal 58mm</strong>: Siap cetak ke semua printer thermal kasir USB/BT.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Hitung Laba Kotor Harian</strong>: Real-time harga jual dikurangi modal HPP + Export CSV.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-outline" onclick="launchDemo('tier1')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            Coba Demo Tier 1
+          </button>
+          <button class="btn btn-primary" onclick="openOrderModal('T1')">
+            Pesan Tier 1 (Rp100k)
+          </button>
+        </div>
+      </div>
+
+      <!-- TIER 2 -->
+      <div class="pricing-card popular">
+        <div class="card-top">
+          <span class="tier-ribbon ribbon-t2">TIER 2 &bull; PALING LARIS</span>
+          <h3>Business Studio</h3>
+          <div class="card-ideal-for">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" x2="6" y1="1" y2="4"/><line x1="10" x2="10" y1="1" y2="4"/><line x1="14" x2="14" y1="1" y2="4"/></svg>
+            Cocok: Cafe, Restoran, Barbershop, Coffee Shop
+          </div>
+
+          <div class="price-block">
+            <div class="price-num">Rp 450.000</div>
+            <div class="price-term">Lisensi Komersial Lengkap &bull; Sekali Beli</div>
+          </div>
+
+          <div class="whats-included-label">Semua Fitur Tier 1, Ditambah:</div>
+          <ul class="feature-list">
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Keamanan Dual-Role PIN (8888)</strong>: Mode Kasir dibatasi, Mode Owner dilindungi PIN.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Denah Meja Dine-In 12 Meja</strong>: Visual warna (Kosong, Makan, Menunggu) &amp; Tahan Pesanan.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Split Bill (Pisah Tagihan)</strong>: Otomatis bagi rata sub-bill per tamu (2–4 orang).</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Varian &amp; Modifiers Bertingkat</strong>: Ukuran, topping, tingkat gula dengan harga dinamis.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Audit Rekonsiliasi Kasir (Anti-Fraud)</strong>: Hitung fisik vs sistem untuk deteksi selisih laci.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Dual-Print (58mm/80mm)</strong>: Cetak 1 Struk Pelanggan + 1 Tiket Dapur (tanpa harga).</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-outline" onclick="launchDemo('tier2')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            Coba Demo Tier 2
+          </button>
+          <button class="btn btn-primary" onclick="openOrderModal('T2')">
+            Pesan Tier 2 (Rp450k)
+          </button>
+        </div>
+      </div>
+
+      <!-- TIER 3 -->
+      <div class="pricing-card enterprise">
+        <div class="card-top">
+          <span class="tier-ribbon ribbon-t3">TIER 3 &bull; ENTERPRISE</span>
+          <h3>Autonomous Mesh</h3>
+          <div class="card-ideal-for">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            Cocok: Franchise, Resto Besar, Multi-Cabang, Cloud OS
+          </div>
+
+          <div class="price-block">
+            <div class="price-num">Rp 1.800.000</div>
+            <div class="price-term">Solusi Korporat Lengkap &bull; Lisensi Cloud Mesh</div>
+          </div>
+
+          <div class="whats-included-label">Semua Fitur Tier 1 &amp; 2, Ditambah:</div>
+          <ul class="feature-list">
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Routing Multi-Cabang &amp; Gudang</strong>: Konteks cabang Jakarta, BSD, &amp; Warehouse Pusat.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>BOM Resep Bahan Baku (Gram/ml)</strong>: Potong stok kopi, susu, cup hingga presisi desimal.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Dynamic QRIS Auto-Settlement</strong>: Generate QR per transaksi dengan simulasi webhook.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>KDS Dapur Live Bridge</strong>: Layar monitor antrean koki dengan timer &amp; priority bump.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Omnichannel WhatsApp E-Receipt</strong>: Kirim struk resmi langsung ke chat WA pembeli.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Executive BI &amp; Prediksi AI</strong>: Waterfall profit dan peringatan stok habis otomatis.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Audit Trail Berantai SHA-256</strong>: Catatan audit anti-tamper untuk setiap aksi kasir.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-outline" onclick="launchDemo('tier3')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            Coba Demo Tier 3
+          </button>
+          <button class="btn btn-cyan" onclick="openOrderModal('T3')">
+            Pesan Tier 3 (Rp1.8jt)
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Live Demo Strip -->
+    <div class="sandbox-preview-strip">
+      <div class="sandbox-text">
+        <h3>Mau Coba Langsung di Perangkat Komputer / Laptop Anda?</h3>
+        <p>Buka sandbox demo interaktif kami. Anda bisa mencoba transaksi, menambah menu, menguji cetak struk, dan memeriksa sistem meja secara real-time.</p>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <button class="btn btn-outline" onclick="launchDemo('tier1')">Demo Tier 1</button>
+        <button class="btn btn-primary" onclick="launchDemo('tier2')">Demo Tier 2</button>
+        <button class="btn btn-cyan" onclick="launchDemo('tier3')">Demo Tier 3</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Matriks Perbandingan Fitur Lengkap -->
+  <section class="comparison-section" id="perbandingan">
+    <div class="section-title-wrap">
+      <div class="section-eyebrow">TABEL SPESIFIKASI TEKNIS</div>
+      <h2 class="section-heading">Perbandingan Fitur Antar Tier</h2>
+      <p class="section-subheading">Ketahui rincian pasti setiap kapabilitas sistem sebelum memutuskan pembelian.</p>
+    </div>
+
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th style="width: 40%;">Kapabilitas &amp; Modul Operasional</th>
+          <th style="width: 20%; text-align: center;">Tier 1: Starter (100k)</th>
+          <th style="width: 20%; text-align: center;">Tier 2: Studio (450k)</th>
+          <th style="width: 20%; text-align: center;">Tier 3: Mesh (1.8jt)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Operasional 100% Offline (Tanpa Internet)</td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+        </tr>
+        <tr>
+          <td>Biaya Langganan Bulanan (Monthly Subscription)</td>
+          <td style="text-align: center;"><span class="check-yes">Rp 0 (Sekali Beli)</span></td>
+          <td style="text-align: center;"><span class="check-yes">Rp 0 (Sekali Beli)</span></td>
+          <td style="text-align: center;"><span class="check-yes">Rp 0 (Sekali Beli)</span></td>
+        </tr>
+        <tr>
+          <td>Manajemen Produk &amp; Quick Stock Step (+ / -)</td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+        </tr>
+        <tr>
+          <td>Cetak Struk Thermal 58mm Standar</td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+        </tr>
+        <tr>
+          <td>Laba Kotor Harian (Gross Profit) &amp; Export CSV</td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+        </tr>
+        <tr>
+          <td>Denah Meja Dine-In (Table 01 - Table 12) &amp; Tahan Bill</td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+        </tr>
+        <tr>
+          <td>Pisah Tagihan (Split Bill Otomatis)</td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+        </tr>
+        <tr>
+          <td>Varian &amp; Modifiers Bertingkat (Size, Sugar, Shot)</td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+        </tr>
+        <tr>
+          <td>Mode Keamanan PIN Supervisor / Owner (PIN: 8888)</td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya (5 Roles)</span></td>
+        </tr>
+        <tr>
+          <td>Audit Rekonsiliasi Kasir &amp; Deteksi Fraud Selisih Uang</td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+        </tr>
+        <tr>
+          <td>Multi-Slip Printing: Tiket Dapur Terpisah (Tanpa Harga)</td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; 58mm/80mm</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; 58mm/80mm</span></td>
+        </tr>
+        <tr>
+          <td>Routing Multi-Cabang &amp; Gudang Logistik Terpusat</td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+        </tr>
+        <tr>
+          <td>BOM Resep Bahan Mentah (Potong Gram/ml Desimal)</td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+        </tr>
+        <tr>
+          <td>Dynamic QRIS Gateway &amp; Auto-Settlement Webhook</td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+        </tr>
+        <tr>
+          <td>Kitchen Display System (KDS) Live Bridge &amp; Priority Bumping</td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+        </tr>
+        <tr>
+          <td>Omnichannel Kirim Struk Digital ke WhatsApp Pelanggan</td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+        </tr>
+        <tr>
+          <td>Prediksi Kebutuhan Stok AI &amp; Audit Trail Kriptografi</td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-no">-</span></td>
+          <td style="text-align: center;"><span class="check-yes">&#10003; Ya</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Arsitektur Keamanan Anti-Hack -->
+  <section class="security-section" id="keamanan">
+    <div class="section-title-wrap">
+      <div class="section-eyebrow">TEKNOLOGI CYBER SECURITY</div>
+      <h2 class="section-heading">Keamanan Tingkat Lanjut: Anti-Bajak &amp; Anti-Tamper</h2>
+      <p class="section-subheading">
+        Mengapa aplikasi ini aman dari pembajakan dan manipulasi? Dibangun dengan standar Web Crypto API militer.
+      </p>
+    </div>
+
+    <div class="security-cards-grid">
+      <div class="sec-card">
+        <div class="sec-icon-circle">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h4>Hardware Lock SHA-256</h4>
+        <p>Setiap lisensi terikat dengan sidik jari hardware komputer (User-Agent, Canvas 2D render, Audio Context, dan Screen Depth). Kunci tidak dapat digandakan ke perangkat lain tanpa izin.</p>
+      </div>
+
+      <div class="sec-card">
+        <div class="sec-icon-circle">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h4>HMAC Offline Verification</h4>
+        <p>Validasi tanda tangan serial key menggunakan kriptografi asimetris offline. Tidak perlu menghubungi server pusat setiap kali buka kasir, namun mustahil dipalsukan dengan keygen abal-abal.</p>
+      </div>
+
+      <div class="sec-card">
+        <div class="sec-icon-circle">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+        </div>
+        <h4>Enkripsi AES-GCM 256</h4>
+        <p>Data transaksi dan omzet tersimpan dalam format terenkripsi dengan IV acak dan PBKDF2 salt derivation, melindungi privasi finansial toko dari akses ilegal.</p>
+      </div>
+
+      <div class="sec-card">
+        <div class="sec-icon-circle">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h4>Clock Rollback Guard</h4>
+        <p>Sistem secara otomatis mendeteksi jika tanggal atau jam komputer sengaja dimundurkan untuk memanipulasi kedaluwarsa lisensi atau laporan audit.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Live Demo Sandbox Modal -->
+  <div class="modal-backdrop" id="demo-modal">
+    <div class="demo-modal-window">
+      <div class="demo-modal-top">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <h4 id="demo-modal-title" style="font-size: 15px; font-weight: 700; color: #FFFFFF;">Live POS Demo Sandbox</h4>
+          <span class="demo-sandbox-notice">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            SANDBOX MODE &bull; DATA TERSIMPAN DI SESI BROWSER
+          </span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button class="btn btn-outline btn-sm" onclick="switchDemoTier('tier1')">Tier 1</button>
+          <button class="btn btn-outline btn-sm" onclick="switchDemoTier('tier2')">Tier 2</button>
+          <button class="btn btn-outline btn-sm" onclick="switchDemoTier('tier3')">Tier 3</button>
+          <button class="btn btn-outline btn-sm" style="color: var(--rose);" onclick="closeDemoModal()">Tutup Demo</button>
+        </div>
+      </div>
+      <iframe id="demo-iframe" class="demo-iframe-container" src="about:blank"></iframe>
+    </div>
+  </div>
+
+  <!-- WhatsApp Order Modal -->
+  <div class="modal-backdrop" id="order-modal">
+    <div class="order-modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+        <h3 style="font-size: 18px; font-weight: 700;">Formulir Pemesanan Lisensi Resmi</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeOrderModal()">Batal</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Pilihan Paket POS:</label>
+        <select id="order-tier-select" class="form-input">
+          <option value="Tier 1: Starter Core (Rp100.000)">Tier 1: Starter Core — Rp 100.000</option>
+          <option value="Tier 2: Business Studio (Rp450.000)" selected>Tier 2: Business Studio — Rp 450.000</option>
+          <option value="Tier 3: Autonomous Mesh (Rp1.800.000)">Tier 3: Autonomous Mesh — Rp 1.800.000</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nama Anda / Pemilik Toko:</label>
+        <input type="text" id="order-name-input" class="form-input" placeholder="Contoh: Budi Santoso">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nama Usaha / Brand Toko:</label>
+        <input type="text" id="order-store-input" class="form-input" placeholder="Contoh: Kopi Sudirman">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Kota / Lokasi:</label>
+        <input type="text" id="order-city-input" class="form-input" placeholder="Contoh: Jakarta Selatan">
+      </div>
+
+      <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-sm); padding: 12px; font-size: 12px; color: var(--emerald);">
+        Hardware ID Komputer Anda otomatis terlampir agar lisensi dapat langsung digenerate tanpa proses lama.
+      </div>
+
+      <button class="btn btn-emerald" onclick="submitOrderToWhatsApp()" style="width: 100%; padding: 14px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Lanjutkan Chat ke WhatsApp Penjual
+      </button>
+    </div>
+  </div>
+
+  <!-- Protected Reseller Area Modal (Protected with PIN/Key) -->
+  <div class="modal-backdrop" id="reseller-auth-modal">
+    <div class="order-modal-box" style="max-width: 440px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+        <h3 style="font-size: 16px; font-weight: 700;">Area Khusus Mitra Reseller</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeResellerModal()">Tutup</button>
+      </div>
+
+      <p style="font-size: 12px; color: var(--text-muted);">
+        Panel penerbitan serial key, manajemen kuota diskon 50%, dan unit test engine dilindungi PIN otorisasi reseller.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">PIN Keamanan Reseller (Default Demo: 8888):</label>
+        <input type="password" id="reseller-pin-input" class="form-input" placeholder="Masukkan 4-digit PIN..." maxlength="6" style="font-family: var(--font-mono); text-align: center; font-size: 20px; letter-spacing: 6px;">
+      </div>
+
+      <div id="reseller-auth-err" style="display: none; color: var(--rose); font-size: 12px; text-align: center;">
+        PIN Otorisasi Salah! Akses ditolak.
+      </div>
+
+      <button class="btn btn-primary" onclick="verifyResellerPin()">Buka Panel Reseller</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div>&copy; 2026 Kasir POS Architecture System. Standalone Cryptographic POS Suite.</div>
+    <div style="margin-top: 6px; font-family: var(--font-mono); font-size: 11px; opacity: 0.6;">
+      Web Crypto API Compliant &bull; Zero External Dependencies &bull; Tamper-Proof Monotonic Protection
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/license-core.js"></script>
+
+  <script>
+    let localMachineId = '';
+
+    async function initLandingPage() {
+      if (window.KasirSecurity) {
+        localMachineId = await window.KasirSecurity.MachineFingerprint.generateMachineId();
+        document.getElementById('nav-machine-id').textContent = `DEVICE: ${localMachineId}`;
+      }
+    }
+
+    // Interactive Demo Launcher
+    function launchDemo(tier) {
+      const modal = document.getElementById('demo-modal');
+      const iframe = document.getElementById('demo-iframe');
+      const title = document.getElementById('demo-modal-title');
+
+      const tierMap = {
+        tier1: { url: 'tier1/index.html', title: 'Live Sandbox: Tier 1 — Starter Core (Rp100.000)' },
+        tier2: { url: 'tier2/index.html', title: 'Live Sandbox: Tier 2 — Business Studio (Rp450.000)' },
+        tier3: { url: 'tier3/index.html', title: 'Live Sandbox: Tier 3 — Autonomous Mesh (Rp1.800.000)' }
+      };
+
+      const selected = tierMap[tier] || tierMap.tier2;
+      title.textContent = selected.title;
+      iframe.src = selected.url;
+      modal.classList.add('active');
+    }
+
+    function switchDemoTier(tier) {
+      launchDemo(tier);
+    }
+
+    function closeDemoModal() {
+      const modal = document.getElementById('demo-modal');
+      const iframe = document.getElementById('demo-iframe');
+      iframe.src = 'about:blank';
+      modal.classList.remove('active');
+    }
+
+    // Order Modal
+    function openOrderModal(preferredTier = 'T2') {
+      const select = document.getElementById('order-tier-select');
+      if (preferredTier === 'T1') select.selectedIndex = 0;
+      if (preferredTier === 'T2') select.selectedIndex = 1;
+      if (preferredTier === 'T3') select.selectedIndex = 2;
+      document.getElementById('order-modal').classList.add('active');
+    }
+
+    function closeOrderModal() {
+      document.getElementById('order-modal').classList.remove('active');
+    }
+
+    function submitOrderToWhatsApp() {
+      const tier = document.getElementById('order-tier-select').value;
+      const name = document.getElementById('order-name-input').value.trim() || 'Pelanggan';
+      const store = document.getElementById('order-store-input').value.trim() || 'Toko Saya';
+      const city = document.getElementById('order-city-input').value.trim() || 'Indonesia';
+
+      const sellerPhone = '6281234567890'; // Target seller phone number
+      const message = 
+`Halo Tim Kasir POS Architecture,
+Saya ingin memesan lisensi resmi untuk aplikasi kasir berikut:
+
+*Paket:* ${tier}
+*Nama Pemilik:* ${name}
+*Nama Usaha:* ${store}
+*Kota:* ${city}
+*Hardware Machine-ID Saya:* ${localMachineId || 'Terlampir saat aktivasi'}
+
+Mohon informasi nomor rekening dan panduan instalasinya. Terima kasih!`;
+
+      const waUrl = `https://wa.me/${sellerPhone}?text=${encodeURIComponent(message)}`;
+      window.open(waUrl, '_blank');
+      closeOrderModal();
+    }
+
+    // Protected Reseller Access
+    function openResellerModal() {
+      document.getElementById('reseller-pin-input').value = '';
+      document.getElementById('reseller-auth-err').style.display = 'none';
+      document.getElementById('reseller-auth-modal').classList.add('active');
+    }
+
+    function closeResellerModal() {
+      document.getElementById('reseller-auth-modal').classList.remove('active');
+    }
+
+    function verifyResellerPin() {
+      const pin = document.getElementById('reseller-pin-input').value;
+      if (pin === '8888') {
+        closeResellerModal();
+        // Redirect to protected reseller panel anchor
+        window.location.href = 'index.html#reseller-panel';
+        alert('Otorisasi Mitra Reseller Berhasil!');
+      } else {
+        document.getElementById('reseller-auth-err').style.display = 'block';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', initLandingPage);
+  </script>
+</body>
+</html>
